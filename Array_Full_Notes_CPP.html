@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Array — Basics + Patterns (C++) — Complete Notes</title>
+<style>
+  :root{
+    --bg:#0b0f19; --panel:#121826; --panel2:#161f30; --border:#232d42;
+    --accent:#8b5cf6; --accent2:#22d3ee; --accent3:#f472b6;
+    --green:#34d399; --orange:#fbbf24; --red:#f87171;
+    --text:#e2e8f0; --muted:#94a3b8;
+  }
+  *{box-sizing:border-box; scroll-behavior:smooth;}
+  body{ margin:0; background:var(--bg); color:var(--text);
+    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; display:flex; min-height:100vh; }
+
+  #sidebar{ width:260px; min-width:260px; background:var(--panel);
+    border-right:1px solid var(--border); padding:18px 12px;
+    position:sticky; top:0; height:100vh; overflow-y:auto; }
+  #sidebar h2{ font-size:14px; color:var(--accent2); margin:4px 6px 14px; letter-spacing:0.5px;}
+  #sidebar a{ display:block; color:var(--muted); text-decoration:none; font-size:12.5px;
+    padding:7px 10px; border-radius:8px; margin-bottom:2px; transition:0.15s; border-left:3px solid transparent;}
+  #sidebar a:hover{ background:var(--panel2); color:var(--text); border-left:3px solid var(--accent);}
+  #sidebar .grp{ color:#5b6478; font-size:10.5px; text-transform:uppercase; letter-spacing:1px; margin:14px 8px 4px;}
+  #sidebar .pnum{ display:inline-block; background:var(--accent); color:#fff; font-size:9.5px; font-weight:700;
+    width:16px; height:16px; border-radius:4px; text-align:center; line-height:16px; margin-right:6px;}
+
+  #main{ flex:1; padding:30px 40px; max-width:1000px; }
+  .hero{ background:linear-gradient(135deg,#1e1b4b,#312e81 40%,#4c1d95); border-radius:18px;
+    padding:38px 34px; margin-bottom:26px; border:1px solid var(--border); box-shadow:0 0 60px rgba(139,92,246,0.15);}
+  .hero h1{ font-size:27px; margin:0 0 8px; background:linear-gradient(90deg,#c4b5fd,#67e8f9);
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero p{ color:var(--muted); font-size:13.5px; margin:4px 0; }
+  .chip{ display:inline-block; background:rgba(139,92,246,0.15); color:#c4b5fd; border:1px solid rgba(139,92,246,0.4);
+    padding:5px 12px; border-radius:20px; font-size:11px; margin:8px 4px 0 0;}
+
+  .part-banner{ background:linear-gradient(90deg, rgba(139,92,246,0.18), rgba(34,211,238,0.08));
+    border:1px solid var(--accent); border-radius:12px; padding:16px 20px; margin:30px 0 10px;}
+  .part-banner h2{ margin:0; color:#fff; font-size:20px; }
+  .part-banner p{ margin:6px 0 0; color:var(--muted); font-size:12.5px; }
+
+  section{ margin-bottom:14px; scroll-margin-top:20px; }
+  h2.section-title{ font-size:18px; color:#fff; background:var(--panel2); padding:12px 16px; border-radius:10px;
+    border-left:4px solid var(--accent); margin:26px 0 12px; display:flex; align-items:center; gap:8px;}
+  h3{ color:var(--accent2); font-size:14.5px; margin-top:18px;}
+  p{ line-height:1.65; font-size:13.5px; color:#cbd5e1; }
+  ul,ol{ font-size:13.5px; color:#cbd5e1; line-height:1.7; }
+  b{ color:#fff; }
+
+  .pattern-card{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:14px 0;}
+  .signal{ background:rgba(34,211,238,0.08); border:1px dashed rgba(34,211,238,0.4); border-radius:8px;
+    padding:8px 12px; font-size:12.5px; color:#a5f3fc; margin:10px 0;}
+  .signal b{ color:var(--accent2); }
+
+  details{ background:var(--panel2); border:1px solid var(--border); border-radius:10px; margin:10px 0; overflow:hidden;}
+  details[open]{ border-color:var(--accent); }
+  summary{ cursor:pointer; padding:11px 16px; font-weight:600; font-size:13px; color:var(--text); list-style:none;
+    display:flex; align-items:center; justify-content:space-between; background:#1a2338;}
+  summary::-webkit-details-marker{ display:none; }
+  summary::after{ content:"+"; color:var(--accent2); font-size:18px; font-weight:400; }
+  details[open] summary::after{ content:"–"; }
+  .details-body{ padding:14px 18px; }
+  .sum-left{ display:flex; align-items:center; gap:8px; }
+
+  .callout{ border-radius:10px; padding:11px 15px; margin:10px 0; font-size:12.5px; line-height:1.6; }
+  .tip{ background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.35); }
+  .tip b{ color:var(--green); }
+  .warn{ background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.35); }
+  .warn b{ color:var(--orange); }
+  .interview{ background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.35); }
+  .interview b{ color:var(--red); }
+  .analogy{ background:rgba(34,211,238,0.08); border:1px solid rgba(34,211,238,0.35); }
+  .analogy b{ color:var(--accent2); }
+
+  .diagram{ background:#05070d; border:1px solid var(--border); border-radius:10px; padding:14px;
+    font-family:'Consolas',monospace; font-size:12px; color:#67e8f9; text-align:center; white-space:pre;
+    overflow-x:auto; margin:10px 0;}
+
+  pre{ margin:0; padding:14px 16px; background:#0a0e17; color:#d4d4f4; font-size:12px; overflow-x:auto;
+    line-height:1.55; border-radius:8px; border:1px solid var(--border); }
+  code{ font-family:'Consolas','Courier New',monospace; }
+  p code, li code{ background:rgba(139,92,246,0.15); color:#c4b5fd; padding:1px 6px; border-radius:4px; font-size:12px;}
+
+  table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:12.5px; }
+  th{ background:var(--accent); color:#fff; padding:8px 10px; text-align:left; }
+  td{ padding:7px 10px; border-bottom:1px solid var(--border); color:#cbd5e1; }
+  tr:nth-child(even) td{ background:var(--panel); }
+
+  .badge{ padding:2px 9px; border-radius:12px; font-size:10px; font-weight:700; }
+  .easy{ background:rgba(52,211,153,0.15); color:var(--green); border:1px solid rgba(52,211,153,0.4); }
+  .medium{ background:rgba(251,191,36,0.15); color:var(--orange); border:1px solid rgba(251,191,36,0.4); }
+  .hard{ background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.4); }
+
+  .lc-title{ font-weight:700; color:#fff; }
+
+  .progress-wrap{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 18px; margin:14px 0;}
+  .progress-bar-bg{ background:#1e293b; border-radius:20px; height:10px; overflow:hidden; margin-top:8px;}
+  .progress-bar-fill{ background:linear-gradient(90deg,var(--accent),var(--accent2)); height:100%; width:0%; transition:width .3s;}
+  .check-item{ display:flex; align-items:center; gap:10px; padding:6px 0; font-size:13px; color:#cbd5e1;}
+  .check-item input{ width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+
+  .qa{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin:8px 0; cursor:pointer;}
+  .qa .q{ color:var(--accent2); font-weight:700; font-size:13px; }
+  .qa .a{ margin-top:6px; font-size:12.5px; color:#cbd5e1; display:none; }
+  .qa.open .a{ display:block; }
+  .qa .q::before{ content:"❯ "; color:var(--accent); }
+
+  .foot{ text-align:center; color:#5b6478; font-size:12px; margin:40px 0 10px; }
+
+  ::-webkit-scrollbar{ width:9px; height:9px; }
+  ::-webkit-scrollbar-thumb{ background:#2d3648; border-radius:10px; }
+  ::-webkit-scrollbar-track{ background:var(--bg); }
+
+  @media (max-width:800px){ body{ flex-direction:column; } #sidebar{ width:100%; height:auto; position:relative;} #main{ padding:20px; } }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h2>📦 Array Notes (C++)</h2>
+
+  <div class="grp">Part A — Theory Basics</div>
+  <a href="#intro">1. Kya hota hai?</a>
+  <a href="#memory">2. Memory Layout</a>
+  <a href="#types">3. Static vs Dynamic (vector)</a>
+  <a href="#basic-ops">4. Traversal/Insert/Delete/Search</a>
+  <a href="#2d">5. 2D Arrays / Matrix</a>
+  <a href="#complexity">6. Complexity Sheet</a>
+
+  <div class="grp">Part B — Patterns for LeetCode</div>
+  <a href="#cheatsheet">Pattern Recognition Table</a>
+  <a href="#p1"><span class="pnum">1</span>Two Pointers</a>
+  <a href="#p2"><span class="pnum">2</span>Sliding Window</a>
+  <a href="#p3"><span class="pnum">3</span>Prefix Sum</a>
+  <a href="#p4"><span class="pnum">4</span>Kadane's Algorithm</a>
+  <a href="#p5"><span class="pnum">5</span>Binary Search</a>
+  <a href="#p6"><span class="pnum">6</span>Sorting-based</a>
+  <a href="#p7"><span class="pnum">7</span>Hashing</a>
+  <a href="#p8"><span class="pnum">8</span>In-place Manipulation</a>
+  <a href="#p9"><span class="pnum">9</span>Cyclic Sort</a>
+
+  <div class="grp">Wrap Up</div>
+  <a href="#mistakes">Common Mistakes</a>
+  <a href="#qa">Quick Q&amp;A</a>
+  <a href="#master-list">Master Practice List</a>
+  <a href="#tracker">Progress Tracker</a>
+</div>
+
+<div id="main">
+
+  <div class="hero">
+    <h1>📦 Array — Basics + Patterns (C++)</h1>
+    <p>Ek hi jagah: pehle theory concepts clear karo (Part A), phir wahi concepts patterns ke roop mein LeetCode pe apply karo (Part B).</p>
+    <div>
+      <span class="chip">Pure C++</span>
+      <span class="chip">Theory se Practice tak</span>
+      <span class="chip">9 Patterns</span>
+      <span class="chip">30+ Solved Problems</span>
+    </div>
+  </div>
+
+  <!-- ============ PART A: THEORY ============ -->
+  <div class="part-banner">
+    <h2>📘 Part A — Basic Theory &amp; Concepts</h2>
+    <p>Pehle fundamentals clear karo — array memory mein kaise store hota hai, static vs dynamic, basic operations. Ye foundation Part B ke patterns samajhne ke liye zaroori hai.</p>
+  </div>
+
+  <!-- 1 INTRO -->
+  <section id="intro">
+    <h2 class="section-title">1️⃣ Array kya hota hai?</h2>
+    <p><b>Array</b> ek <b>linear data structure</b> hai jisme same type ke elements <b>contiguous (ek saath, continuous)</b> memory locations mein store hote hain. Har element ka apna <b>index</b> hota hai (0 se shuru).</p>
+
+    <div class="diagram">Index:   0     1     2     3     4
+       ┌─────┬─────┬─────┬─────┬─────┐
+Array: │ 10  │ 20  │ 30  │ 40  │ 50  │
+       └─────┴─────┴─────┴─────┴─────┘
+     Base Address: 2000  2004  2008  2012  2016  (int = 4 bytes)</div>
+
+    <div class="callout analogy"><b>Samjho ise aise:</b> Array ek apartment building ki tarah hai jisme har flat (index) ek fix size ka hai aur sab ek row mein lagatar hain. Isliye flat number pata ho to seedha wahan pahunch sakte ho (O(1) access) — building ke gate se ginte hue jaane ki zaroorat nahi.</div>
+
+    <div class="callout tip"><b>Tip:</b> Array ka address formula: <code>address(i) = base_address + i * size_of_element</code> — isi wajah se index se O(1) mein access milta hai.</div>
+  </section>
+
+  <!-- 2 MEMORY -->
+  <section id="memory">
+    <h2 class="section-title">2️⃣ Memory Layout &amp; Why O(1) Access</h2>
+    <p>Kyunki elements contiguous hain aur har element ka size fix hai, compiler direct formula se kisi bhi index ka address nikal leta hai — isliye <code>arr[5]</code> access karne mein utna hi time lagta hai jitna <code>arr[0]</code> access karne mein.</p>
+    <div class="callout warn"><b>Dhyan dein:</b> Ye O(1) access sirf tab tak hai jab tak index valid range mein ho. Out-of-bounds access C++ mein undefined behavior deta hai (crash ya garbage value) — koi automatic error nahi aata jaise Python mein aata hai.</div>
+  </section>
+
+  <!-- 3 TYPES -->
+  <section id="types">
+    <h2 class="section-title">3️⃣ Static Array vs Dynamic Array (vector)</h2>
+
+    <h3>Static Array (fixed size)</h3>
+    <pre><code>int arr[5] = {10, 20, 30, 40, 50};
+int arr2[5];  // size fix, compile time pe decide hoti hai</code></pre>
+
+    <h3>Dynamic Array — <code>vector</code> (C++ STL)</h3>
+    <pre><code>#include &lt;vector&gt;
+using namespace std;
+
+vector&lt;int&gt; v;              // empty vector
+v.push_back(10);            // end mein insert — amortized O(1)
+v.push_back(20);
+v.pop_back();                // end se delete — O(1)
+v.size();                    // current size
+v[2];                        // index access — O(1)
+
+vector&lt;int&gt; v2(5, 0);        // size 5, sab 0 se initialize</code></pre>
+
+    <table>
+      <tr><th>Property</th><th>Static Array</th><th>Vector (Dynamic)</th></tr>
+      <tr><td>Size</td><td>Fixed, compile-time</td><td>Grow/shrink runtime mein</td></tr>
+      <tr><td>Memory</td><td>Stack (usually)</td><td>Heap mein manage hota hai</td></tr>
+      <tr><td>Resize cost</td><td>Possible nahi</td><td>Amortized O(1) push_back</td></tr>
+    </table>
+
+    <div class="callout tip"><b>Tip:</b> LeetCode par 90% questions mein <code>vector&lt;int&gt;</code> hi milega — isi se comfortable ho jao. Internally jab vector full ho jaata hai, capacity double ho jaati hai (isliye push_back amortized O(1) hai, har baar O(n) nahi).</div>
+  </section>
+
+  <!-- 4 BASIC OPS -->
+  <section id="basic-ops">
+    <h2 class="section-title">4️⃣ Basic Operations</h2>
+
+    <h3>Traversal</h3>
+    <pre><code>for (int i = 0; i < arr.size(); i++) {
+    cout << arr[i] << " ";
+}
+// range-based (cleaner)
+for (int x : arr) cout << x << " ";</code></pre>
+
+    <details>
+      <summary>➕ Insertion — Beginning / End / Position</summary>
+      <div class="details-body">
+<pre><code>// End mein insert — O(1) amortized
+arr.push_back(60);
+
+// Beginning mein insert — O(n), sab shift karna padta hai
+arr.insert(arr.begin(), 5);
+
+// Position pe insert — O(n)
+arr.insert(arr.begin() + 2, 25);</code></pre>
+      </div>
+    </details>
+
+    <details>
+      <summary>➖ Deletion — Beginning / End / Position</summary>
+      <div class="details-body">
+<pre><code>// End se delete — O(1)
+arr.pop_back();
+
+// Beginning se delete — O(n)
+arr.erase(arr.begin());
+
+// Position se delete — O(n)
+arr.erase(arr.begin() + 2);</code></pre>
+        <div class="callout warn"><b>Dhyan dein:</b> Array/vector mein beginning ya middle se insert/delete O(n) hota hai kyunki baaki elements shift karne padte hain — ye Linked List se bada difference hai.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>🔍 Searching — Linear &amp; Binary Search</summary>
+      <div class="details-body">
+<pre><code>// Linear Search — O(n), kisi bhi array pe
+int linearSearch(vector&lt;int&gt;&amp; arr, int key) {
+    for (int i = 0; i < arr.size(); i++)
+        if (arr[i] == key) return i;
+    return -1;
+}
+
+// Binary Search — O(log n), SORTED array pe hi chalta hai
+int binarySearch(vector&lt;int&gt;&amp; arr, int key) {
+    int lo = 0, hi = arr.size() - 1;
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (arr[mid] == key) return mid;
+        else if (arr[mid] < key) lo = mid + 1;
+        else hi = mid - 1;
+    }
+    return -1;
+}</code></pre>
+        <div class="callout tip"><b>Tip:</b> <code>mid = lo + (hi-lo)/2</code> use karo, <code>(lo+hi)/2</code> nahi — bade arrays mein integer overflow se bachne ke liye.</div>
+      </div>
+    </details>
+  </section>
+
+  <!-- 5 2D -->
+  <section id="2d">
+    <h2 class="section-title">5️⃣ 2D Arrays / Matrix</h2>
+    <pre><code>// Static 2D array
+int matrix[3][4];
+
+// Dynamic — vector of vectors
+vector&lt;vector&lt;int&gt;&gt; grid(3, vector&lt;int&gt;(4, 0));  // 3x4, sab 0
+
+// Traversal
+for (int i = 0; i < grid.size(); i++) {
+    for (int j = 0; j < grid[0].size(); j++) {
+        cout << grid[i][j] << " ";
+    }
+}</code></pre>
+    <div class="diagram">grid[i][j]
+   j→  0   1   2   3
+i↓ 0 [ 1 ] [ 2 ] [ 3 ] [ 4 ]
+   1 [ 5 ] [ 6 ] [ 7 ] [ 8 ]
+   2 [ 9 ] [10 ] [11 ] [12 ]</div>
+    <p><b>Common patterns:</b> row-wise/column-wise traversal, spiral traversal, transpose, rotate matrix 90°, diagonal traversal.</p>
+  </section>
+
+  <!-- 6 COMPLEXITY -->
+  <section id="complexity">
+    <h2 class="section-title">6️⃣ Complexity Cheat Sheet</h2>
+    <table>
+      <tr><th>Operation</th><th>Time Complexity</th></tr>
+      <tr><td>Access by index</td><td>O(1)</td></tr>
+      <tr><td>Search (unsorted)</td><td>O(n)</td></tr>
+      <tr><td>Search (sorted — binary search)</td><td>O(log n)</td></tr>
+      <tr><td>Insert/Delete at end</td><td>O(1) amortized</td></tr>
+      <tr><td>Insert/Delete at beginning/middle</td><td>O(n)</td></tr>
+      <tr><td>Sorting</td><td>O(n log n)</td></tr>
+    </table>
+  </section>
+
+  <!-- ============ PART B: PATTERNS ============ -->
+  <div class="part-banner">
+    <h2>🎯 Part B — Standard Patterns for LeetCode</h2>
+    <p>Ab jab basics clear hain, ye 9 reusable patterns 90% Array questions solve kar dete hain.</p>
+  </div>
+
+  <!-- CHEATSHEET -->
+  <section id="cheatsheet">
+    <h2 class="section-title">🎯 Pattern Recognition Cheat Sheet</h2>
+    <table>
+      <tr><th>Question mein ye dikhe...</th><th>Pattern</th></tr>
+      <tr><td>"sorted array", "pair sum", "palindrome check"</td><td>#1 Two Pointers</td></tr>
+      <tr><td>"subarray of size k", "longest/shortest substring/subarray"</td><td>#2 Sliding Window</td></tr>
+      <tr><td>"range sum query", "subarray sum equals k"</td><td>#3 Prefix Sum</td></tr>
+      <tr><td>"maximum subarray sum", "max/min contiguous"</td><td>#4 Kadane's Algorithm</td></tr>
+      <tr><td>"sorted array search", "find peak", "search in rotated"</td><td>#5 Binary Search</td></tr>
+      <tr><td>"merge intervals", "sort colors", "kth largest"</td><td>#6 Sorting-based</td></tr>
+      <tr><td>"two sum", "duplicate", "frequency count"</td><td>#7 Hashing</td></tr>
+      <tr><td>"rotate array", "move zeros", "remove duplicates in-place"</td><td>#8 In-place Manipulation</td></tr>
+      <tr><td>"missing number", "duplicate in range 1 to n"</td><td>#9 Cyclic Sort</td></tr>
+    </table>
+  </section>
+
+  <!-- PATTERN 1: TWO POINTERS -->
+  <section id="p1">
+    <h2 class="section-title">Pattern 1 — Two Pointers</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> Sorted array, "pair with target sum", palindrome check — jab 2 positions ko ek saath (opposite ends se ya same direction mein) move karna ho.</div>
+
+      <h3>Template</h3>
+      <pre><code>int left = 0, right = arr.size() - 1;
+while (left < right) {
+    // condition check karo, left++ ya right-- karo
+}</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Two Sum II (sorted array)</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;int&gt; twoSum(vector&lt;int&gt;&amp; nums, int target) {
+    int left = 0, right = nums.size() - 1;
+    while (left < right) {
+        int sum = nums[left] + nums[right];
+        if (sum == target) return {left + 1, right + 1};
+        else if (sum < target) left++;
+        else right--;
+    }
+    return {};
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Valid Palindrome</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>bool isPalindrome(string s) {
+    int left = 0, right = s.size() - 1;
+    while (left < right) {
+        if (!isalnum(s[left])) { left++; continue; }
+        if (!isalnum(s[right])) { right--; continue; }
+        if (tolower(s[left]) != tolower(s[right])) return false;
+        left++; right--;
+    }
+    return true;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Container With Most Water</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Chhoti height wale pointer ko andar move karo — usi mein sudhaar ka chance hai.</p>
+<pre><code>int maxArea(vector&lt;int&gt;&amp; height) {
+    int left = 0, right = height.size() - 1;
+    int maxWater = 0;
+    while (left < right) {
+        int water = min(height[left], height[right]) * (right - left);
+        maxWater = max(maxWater, water);
+        if (height[left] < height[right]) left++;
+        else right--;
+    }
+    return maxWater;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">3Sum</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Sort karo, phir har element ko fix karke baaki 2 elements Two Pointer se dhundo.</p>
+<pre><code>vector&lt;vector&lt;int&gt;&gt; threeSum(vector&lt;int&gt;&amp; nums) {
+    sort(nums.begin(), nums.end());
+    vector&lt;vector&lt;int&gt;&gt; result;
+
+    for (int i = 0; i < nums.size(); i++) {
+        if (i > 0 && nums[i] == nums[i - 1]) continue; // duplicate skip
+        int left = i + 1, right = nums.size() - 1;
+        while (left < right) {
+            int sum = nums[i] + nums[left] + nums[right];
+            if (sum == 0) {
+                result.push_back({nums[i], nums[left], nums[right]});
+                while (left < right && nums[left] == nums[left+1]) left++;
+                while (left < right && nums[right] == nums[right-1]) right--;
+                left++; right--;
+            } else if (sum < 0) left++;
+            else right--;
+        }
+    }
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> Two Pointers mostly <b>sorted array</b> pe hi kaam karta hai — agar array sorted nahi hai to pehle sort karne ka time O(n log n) add hoga.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 2: SLIDING WINDOW -->
+  <section id="p2">
+    <h2 class="section-title">Pattern 2 — Sliding Window</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "subarray/substring of size k", "longest/shortest subarray with condition" — jab ek contiguous window ko slide karna ho bina restart kiye.</div>
+
+      <h3>Template (variable size window)</h3>
+      <pre><code>int left = 0;
+for (int right = 0; right < arr.size(); right++) {
+    // window mein arr[right] add karo
+
+    while (/* window invalid ho gayi */) {
+        // window se arr[left] remove karo
+        left++;
+    }
+    // yahan window valid hai — answer update karo
+}</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Maximum Sum Subarray of Size K</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>int maxSumSubarray(vector&lt;int&gt;&amp; arr, int k) {
+    int windowSum = 0, maxSum = 0;
+    for (int i = 0; i < arr.size(); i++) {
+        windowSum += arr[i];
+        if (i >= k - 1) {
+            maxSum = max(maxSum, windowSum);
+            windowSum -= arr[i - k + 1];  // window ka pehla element hatao
+        }
+    }
+    return maxSum;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Longest Substring Without Repeating Characters</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>int lengthOfLongestSubstring(string s) {
+    unordered_map&lt;char, int&gt; lastSeen;
+    int left = 0, maxLen = 0;
+
+    for (int right = 0; right < s.size(); right++) {
+        if (lastSeen.count(s[right]) && lastSeen[s[right]] >= left) {
+            left = lastSeen[s[right]] + 1;
+        }
+        lastSeen[s[right]] = right;
+        maxLen = max(maxLen, right - left + 1);
+    }
+    return maxLen;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Minimum Size Subarray Sum</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>int minSubArrayLen(int target, vector&lt;int&gt;&amp; nums) {
+    int left = 0, sum = 0, minLen = INT_MAX;
+    for (int right = 0; right < nums.size(); right++) {
+        sum += nums[right];
+        while (sum >= target) {
+            minLen = min(minLen, right - left + 1);
+            sum -= nums[left];
+            left++;
+        }
+    }
+    return minLen == INT_MAX ? 0 : minLen;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Fixed-size window (size k pata hai) vs Variable-size window (condition ke hisaab se shrink/grow) — dono ka template thoda alag hota hai, dono pehchan na practice karo.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 3: PREFIX SUM -->
+  <section id="p3">
+    <h2 class="section-title">Pattern 3 — Prefix Sum</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "range sum query", "subarray sum equals k", multiple range queries — jahan baar baar sum nikalna ho.</div>
+
+      <h3>Template</h3>
+      <pre><code>vector&lt;int&gt; prefix(arr.size() + 1, 0);
+for (int i = 0; i < arr.size(); i++) {
+    prefix[i + 1] = prefix[i] + arr[i];
+}
+// range [l, r] ka sum = prefix[r+1] - prefix[l]</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Range Sum Query — Immutable</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>class NumArray {
+    vector&lt;int&gt; prefix;
+public:
+    NumArray(vector&lt;int&gt;&amp; nums) {
+        prefix.resize(nums.size() + 1, 0);
+        for (int i = 0; i < nums.size(); i++)
+            prefix[i + 1] = prefix[i] + nums[i];
+    }
+    int sumRange(int left, int right) {
+        return prefix[right + 1] - prefix[left];
+    }
+};</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Subarray Sum Equals K</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Prefix Sum + HashMap combo — jitni baar (currentSum - k) pehle dikha hai, utne subarrays milte hain.</p>
+<pre><code>int subarraySum(vector&lt;int&gt;&amp; nums, int k) {
+    unordered_map&lt;int, int&gt; freq;
+    freq[0] = 1;   // empty prefix
+    int sum = 0, count = 0;
+
+    for (int num : nums) {
+        sum += num;
+        if (freq.count(sum - k)) count += freq[sum - k];
+        freq[sum]++;
+    }
+    return count;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> Prefix Sum ka combo HashMap ke saath ("Subarray Sum Equals K" jaisa) bohot common trick hai — O(n²) brute force ko O(n) mein badal deta hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 4: KADANE -->
+  <section id="p4">
+    <h2 class="section-title">Pattern 4 — Kadane's Algorithm</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "maximum subarray sum", "maximum product subarray" — contiguous subarray ka best sum/product dhundna ho.</div>
+
+      <h3>Template</h3>
+      <pre><code>int currentSum = 0, maxSum = INT_MIN;
+for (int num : arr) {
+    currentSum = max(num, currentSum + num);  // naya subarray shuru karo ya extend karo
+    maxSum = max(maxSum, currentSum);
+}</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Maximum Subarray</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>int maxSubArray(vector&lt;int&gt;&amp; nums) {
+    int currentSum = nums[0], maxSum = nums[0];
+    for (int i = 1; i < nums.size(); i++) {
+        currentSum = max(nums[i], currentSum + nums[i]);
+        maxSum = max(maxSum, currentSum);
+    }
+    return maxSum;
+}</code></pre>
+          <div class="callout tip"><b>Tip:</b> Idea: agar current running sum negative ho jaaye, to usse aage carry karne ka koi fayda nahi — naye index se fresh shuru karo.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Maximum Product Subarray</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Negative number se multiply hone par max aur min swap ho sakte hain — isliye dono track karo.</p>
+<pre><code>int maxProduct(vector&lt;int&gt;&amp; nums) {
+    int maxProd = nums[0], minProd = nums[0], result = nums[0];
+    for (int i = 1; i < nums.size(); i++) {
+        if (nums[i] < 0) swap(maxProd, minProd);
+        maxProd = max(nums[i], maxProd * nums[i]);
+        minProd = min(nums[i], minProd * nums[i]);
+        result = max(result, maxProd);
+    }
+    return result;
+}</code></pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- PATTERN 5: BINARY SEARCH -->
+  <section id="p5">
+    <h2 class="section-title">Pattern 5 — Binary Search (on Array &amp; on Answer)</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "sorted array", "search in rotated array", "find peak element", "minimize the maximum" — jahan search space ko half-half karke narrow kar sakte ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Binary Search (basic)</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>int search(vector&lt;int&gt;&amp; nums, int target) {
+    int lo = 0, hi = nums.size() - 1;
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (nums[mid] == target) return mid;
+        else if (nums[mid] < target) lo = mid + 1;
+        else hi = mid - 1;
+    }
+    return -1;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Search in Rotated Sorted Array</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Har step pe pehchano kaunsa half sorted hai, phir target us half mein hai ya nahi check karo.</p>
+<pre><code>int search(vector&lt;int&gt;&amp; nums, int target) {
+    int lo = 0, hi = nums.size() - 1;
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (nums[mid] == target) return mid;
+
+        if (nums[lo] <= nums[mid]) {          // left half sorted hai
+            if (nums[lo] <= target && target < nums[mid]) hi = mid - 1;
+            else lo = mid + 1;
+        } else {                               // right half sorted hai
+            if (nums[mid] < target && target <= nums[hi]) lo = mid + 1;
+            else hi = mid - 1;
+        }
+    }
+    return -1;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Koko Eating Bananas</span> (Binary Search on Answer)</span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Jab direct answer search na ho, to "answer range" pe binary search karo — feasibility check karke.</p>
+<pre><code>bool canFinish(vector&lt;int&gt;&amp; piles, int speed, int h) {
+    long hours = 0;
+    for (int p : piles) hours += (p + speed - 1) / speed;  // ceil division
+    return hours <= h;
+}
+
+int minEatingSpeed(vector&lt;int&gt;&amp; piles, int h) {
+    int lo = 1, hi = *max_element(piles.begin(), piles.end());
+    while (lo < hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (canFinish(piles, mid, h)) hi = mid;
+        else lo = mid + 1;
+    }
+    return lo;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> "Binary Search on Answer" ek advanced but bohot powerful sub-pattern hai — jab bhi "minimize the maximum" ya "maximize the minimum" dikhe, ye try karo.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 6: SORTING BASED -->
+  <section id="p6">
+    <h2 class="section-title">Pattern 6 — Sorting-based Patterns</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "merge intervals", "sort colors", "kth largest/smallest" — jahan sorting se problem simplify ho jaati hai.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Merge Intervals</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;vector&lt;int&gt;&gt; merge(vector&lt;vector&lt;int&gt;&gt;&amp; intervals) {
+    sort(intervals.begin(), intervals.end());
+    vector&lt;vector&lt;int&gt;&gt; result;
+
+    for (auto&amp; interval : intervals) {
+        if (result.empty() || result.back()[1] < interval[0]) {
+            result.push_back(interval);
+        } else {
+            result.back()[1] = max(result.back()[1], interval[1]);
+        }
+    }
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Sort Colors</span> (Dutch National Flag)</span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>3-way partitioning — ek hi pass mein 0,1,2 ko sahi jagah rakh do, extra space bina.</p>
+<pre><code>void sortColors(vector&lt;int&gt;&amp; nums) {
+    int low = 0, mid = 0, high = nums.size() - 1;
+    while (mid <= high) {
+        if (nums[mid] == 0) { swap(nums[low], nums[mid]); low++; mid++; }
+        else if (nums[mid] == 1) { mid++; }
+        else { swap(nums[mid], nums[high]); high--; }
+    }
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Kth Largest Element</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Simple approach: sort karke <code>n-k</code> index return karo. Optimal: min-heap ya quickselect.</p>
+<pre><code>int findKthLargest(vector&lt;int&gt;&amp; nums, int k) {
+    sort(nums.begin(), nums.end());
+    return nums[nums.size() - k];
+}
+// Time: O(n log n). Quickselect se average O(n) mein ho sakta hai.</code></pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- PATTERN 7: HASHING -->
+  <section id="p7">
+    <h2 class="section-title">Pattern 7 — Hashing</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "two sum", "duplicate check", "frequency count", "group by" — jahan O(1) lookup se O(n) mein solve ho sake.</div>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Two Sum</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;int&gt; twoSum(vector&lt;int&gt;&amp; nums, int target) {
+    unordered_map&lt;int, int&gt; seen;   // value -> index
+    for (int i = 0; i < nums.size(); i++) {
+        int need = target - nums[i];
+        if (seen.count(need)) return {seen[need], i};
+        seen[nums[i]] = i;
+    }
+    return {};
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Contains Duplicate</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>bool containsDuplicate(vector&lt;int&gt;&amp; nums) {
+    unordered_set&lt;int&gt; seen;
+    for (int num : nums) {
+        if (seen.count(num)) return true;
+        seen.insert(num);
+    }
+    return false;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Top K Frequent Elements</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;int&gt; topKFrequent(vector&lt;int&gt;&amp; nums, int k) {
+    unordered_map&lt;int, int&gt; freq;
+    for (int num : nums) freq[num]++;
+
+    priority_queue&lt;pair&lt;int,int&gt;&gt; pq;  // max-heap by frequency
+    for (auto&amp; [num, count] : freq) pq.push({count, num});
+
+    vector&lt;int&gt; result;
+    while (k--) {
+        result.push_back(pq.top().second);
+        pq.pop();
+    }
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Jab bhi "O(n²) brute force" soch rahe ho aur ek loop mein "kya ye pehle dikha tha?" jaisa sawaal aa raha ho — turant HashMap/HashSet use karne ka socho.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 8: IN-PLACE -->
+  <section id="p8">
+    <h2 class="section-title">Pattern 8 — In-place Array Manipulation</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "rotate array", "move zeros", "remove duplicates from sorted array — in place" — jahan O(1) extra space mein array ko modify karna ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Rotate Array</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Trick: pura array reverse karo, phir pehle k aur baaki n-k ko alag-alag reverse karo.</p>
+<pre><code>void rotate(vector&lt;int&gt;&amp; nums, int k) {
+    k = k % nums.size();
+    reverse(nums.begin(), nums.end());
+    reverse(nums.begin(), nums.begin() + k);
+    reverse(nums.begin() + k, nums.end());
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Move Zeroes</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>void moveZeroes(vector&lt;int&gt;&amp; nums) {
+    int insertPos = 0;
+    for (int i = 0; i < nums.size(); i++) {
+        if (nums[i] != 0) {
+            swap(nums[insertPos], nums[i]);
+            insertPos++;
+        }
+    }
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Remove Duplicates from Sorted Array</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>int removeDuplicates(vector&lt;int&gt;&amp; nums) {
+    if (nums.empty()) return 0;
+    int slow = 0;
+    for (int fast = 1; fast < nums.size(); fast++) {
+        if (nums[fast] != nums[slow]) {
+            slow++;
+            nums[slow] = nums[fast];
+        }
+    }
+    return slow + 1;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> "In-place" ka matlab O(1) extra space — ye pattern aksar <b>slow-fast pointer</b> (same array ke andar) use karta hai, Linked List wale fast-slow se concept similar hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 9: CYCLIC SORT -->
+  <section id="p9">
+    <h2 class="section-title">Pattern 9 — Cyclic Sort</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "numbers from 1 to n", "missing number", "duplicate number" — jab array mein ek fix range (1 to n) ke numbers hon.</div>
+
+      <h3>Template</h3>
+      <pre><code>int i = 0;
+while (i < nums.size()) {
+    int correctIdx = nums[i] - 1;
+    if (nums[i] != nums[correctIdx]) {
+        swap(nums[i], nums[correctIdx]);
+    } else {
+        i++;
+    }
+}
+// ab har number apni sahi jagah (index = value-1) pe hoga</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Find the Missing Number</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>int missingNumber(vector&lt;int&gt;&amp; nums) {
+    int i = 0, n = nums.size();
+    while (i < n) {
+        int correctIdx = nums[i];
+        if (nums[i] < n && nums[i] != nums[correctIdx]) {
+            swap(nums[i], nums[correctIdx]);
+        } else {
+            i++;
+        }
+    }
+    for (int j = 0; j < n; j++)
+        if (nums[j] != j) return j;
+    return n;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Find All Duplicates in an Array</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;int&gt; findDuplicates(vector&lt;int&gt;&amp; nums) {
+    int i = 0;
+    while (i < nums.size()) {
+        int correctIdx = nums[i] - 1;
+        if (nums[i] != nums[correctIdx]) swap(nums[i], nums[correctIdx]);
+        else i++;
+    }
+    vector&lt;int&gt; result;
+    for (int j = 0; j < nums.size(); j++)
+        if (nums[j] != j + 1) result.push_back(nums[j]);
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Cyclic Sort O(n) time aur O(1) space mein "1 to n" range ke missing/duplicate problems solve kar deta hai — HashSet approach se better (jo O(n) space leta hai).</div>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section id="mistakes">
+    <h2 class="section-title">⚠️ Common Mistakes &amp; Interview Tips</h2>
+    <ul>
+      <li>Array index out of bounds — C++ mein silent crash/garbage value deta hai, error nahi</li>
+      <li><code>(lo+hi)/2</code> use karna binary search mein — overflow ho sakta hai, <code>lo + (hi-lo)/2</code> use karo</li>
+      <li>Sliding window mein <code>left</code> pointer ko galat condition mein move karna</li>
+      <li>2D array traversal mein rows/cols ki size confuse karna — hamesha <code>grid.size()</code> aur <code>grid[0].size()</code> check karo</li>
+      <li>In-place modification karte waqt original array ke size/index invalidate ho jaana (especially erase() loop ke andar)</li>
+      <li>Sorting-based approach use karte waqt time complexity bhool jaana (O(n log n) add hota hai)</li>
+    </ul>
+    <div class="callout warn"><b>Dhyan dein:</b> "Can you do it in O(1) space?" — ye follow-up interviewer aksar pucchta hai. Pehle apna normal solution do, phir in-place optimize karne ki koshish karo.</div>
+  </section>
+
+  <!-- QA -->
+  <section id="qa">
+    <h2 class="section-title">🧠 Quick Revision — Click to Reveal</h2>
+
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Two Pointers aur Sliding Window mein kya farak hai?</div>
+      <div class="a">Two Pointers mein pointers alag directions se move ho sakte hain (opposite ends se). Sliding Window mein ek "window" hoti hai jo hamesha ek direction mein grow/shrink hoti hai (contiguous range maintain karta hai).</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Prefix Sum kab use karna chahiye?</div>
+      <div class="a">Jab multiple range-sum queries poochi jaayein, ya "subarray sum = k" jaisa pattern ho. Ek baar O(n) mein prefix array bana lo, phir har query O(1) mein answer ho jaati hai.</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Cyclic Sort sirf kab kaam karta hai?</div>
+      <div class="a">Jab array mein numbers ek fix range (jaise 1 to n, ya 0 to n-1) mein hon. Random range ke numbers ke liye ye kaam nahi karega.</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Kadane's Algorithm ka core idea kya hai?</div>
+      <div class="a">Agar current running sum negative ho jaaye, to usse aage carry karne ka fayda nahi — naye index se fresh subarray shuru karo. Isse O(n) mein max subarray sum mil jaata hai.</div>
+    </div>
+  </section>
+
+  <!-- MASTER LIST -->
+  <section id="master-list">
+    <h2 class="section-title">📋 Master Practice List (Pattern-wise)</h2>
+    <table>
+      <tr><th>#</th><th>Problem</th><th>Pattern</th><th>Level</th></tr>
+      <tr><td>1</td><td>Two Sum</td><td>#7 Hashing</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>2</td><td>Two Sum II (sorted)</td><td>#1 Two Pointers</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>3</td><td>Valid Palindrome</td><td>#1 Two Pointers</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>4</td><td>Contains Duplicate</td><td>#7 Hashing</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>5</td><td>Move Zeroes</td><td>#8 In-place</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>6</td><td>Remove Duplicates from Sorted Array</td><td>#8 In-place</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>7</td><td>Binary Search</td><td>#5 Binary Search</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>8</td><td>Missing Number</td><td>#9 Cyclic Sort</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>9</td><td>Maximum Sum Subarray of Size K</td><td>#2 Sliding Window</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>10</td><td>Range Sum Query — Immutable</td><td>#3 Prefix Sum</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>11</td><td>Container With Most Water</td><td>#1 Two Pointers</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>12</td><td>3Sum</td><td>#1 + #6 Combo</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>13</td><td>Longest Substring Without Repeating Chars</td><td>#2 Sliding Window</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>14</td><td>Minimum Size Subarray Sum</td><td>#2 Sliding Window</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>15</td><td>Subarray Sum Equals K</td><td>#3 + #7 Combo</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>16</td><td>Maximum Subarray</td><td>#4 Kadane's</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>17</td><td>Maximum Product Subarray</td><td>#4 Kadane's (variant)</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>18</td><td>Search in Rotated Sorted Array</td><td>#5 Binary Search</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>19</td><td>Koko Eating Bananas</td><td>#5 Binary Search on Answer</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>20</td><td>Merge Intervals</td><td>#6 Sorting-based</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>21</td><td>Sort Colors</td><td>#6 Sorting-based</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>22</td><td>Kth Largest Element</td><td>#6 Sorting-based</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>23</td><td>Top K Frequent Elements</td><td>#7 Hashing</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>24</td><td>Rotate Array</td><td>#8 In-place</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>25</td><td>Find All Duplicates in an Array</td><td>#9 Cyclic Sort</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>26</td><td>Product of Array Except Self</td><td>#3 Prefix Sum (variant)</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>27</td><td>Trapping Rain Water</td><td>#1 Two Pointers</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>28</td><td>First Missing Positive</td><td>#9 Cyclic Sort</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>29</td><td>Median of Two Sorted Arrays</td><td>#5 Binary Search</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>30</td><td>Sliding Window Maximum</td><td>#2 Sliding Window (deque)</td><td><span class="badge hard">Hard</span></td></tr>
+    </table>
+    <div class="callout tip"><b>Tip:</b> In 30 problems ko 2 baar solve karo — pattern muscle-memory ban jaayega aur naye unseen questions bhi crack ho jaayenge.</div>
+  </section>
+
+  <!-- TRACKER -->
+  <section id="tracker">
+    <h2 class="section-title">📊 Progress Tracker</h2>
+    <div class="progress-wrap">
+      <p style="margin:0; color:#fff; font-weight:600;">Progress: <span id="progress-text">0 / 12</span></p>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+      <div style="margin-top:14px;">
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Theory — Memory layout, static vs vector</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Theory — Traversal/Insert/Delete/Search likh sakta/sakti hoon</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Theory — 2D arrays clear hain</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 1 — Two Pointers</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 2 — Sliding Window</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 3 — Prefix Sum</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 4 — Kadane's Algorithm</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 5 — Binary Search</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 6 — Sorting-based</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 7 — Hashing</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 8+9 — In-place &amp; Cyclic Sort</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Kam se kam 20 LeetCode problems solve kiye</div>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">✨ Theory se Pattern tak — ab practice shuru karo. Consistency is the key! ✨</p>
+</div>
+
+<script>
+function updateProgress(){
+  const boxes = document.querySelectorAll('.check-item input');
+  let checked = 0;
+  boxes.forEach(b => { if(b.checked) checked++; });
+  document.getElementById('progress-text').innerText = checked + ' / ' + boxes.length;
+  document.getElementById('progress-fill').style.width = (checked/boxes.length*100) + '%';
+}
+</script>
+
+</body>
+</html>

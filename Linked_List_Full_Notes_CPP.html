@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linked List — Basics + Patterns (C++) — Complete Notes</title>
+<style>
+  :root{
+    --bg:#0b0f19; --panel:#121826; --panel2:#161f30; --border:#232d42;
+    --accent:#8b5cf6; --accent2:#22d3ee; --accent3:#f472b6;
+    --green:#34d399; --orange:#fbbf24; --red:#f87171;
+    --text:#e2e8f0; --muted:#94a3b8;
+  }
+  *{box-sizing:border-box; scroll-behavior:smooth;}
+  body{ margin:0; background:var(--bg); color:var(--text);
+    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; display:flex; min-height:100vh; }
+
+  #sidebar{ width:260px; min-width:260px; background:var(--panel);
+    border-right:1px solid var(--border); padding:18px 12px;
+    position:sticky; top:0; height:100vh; overflow-y:auto; }
+  #sidebar h2{ font-size:14px; color:var(--accent2); margin:4px 6px 14px; letter-spacing:0.5px;}
+  #sidebar a{ display:block; color:var(--muted); text-decoration:none; font-size:12.5px;
+    padding:7px 10px; border-radius:8px; margin-bottom:2px; transition:0.15s; border-left:3px solid transparent;}
+  #sidebar a:hover{ background:var(--panel2); color:var(--text); border-left:3px solid var(--accent);}
+  #sidebar .grp{ color:#5b6478; font-size:10.5px; text-transform:uppercase; letter-spacing:1px; margin:14px 8px 4px;}
+  #sidebar .pnum{ display:inline-block; background:var(--accent); color:#fff; font-size:9.5px; font-weight:700;
+    width:16px; height:16px; border-radius:4px; text-align:center; line-height:16px; margin-right:6px;}
+
+  #main{ flex:1; padding:30px 40px; max-width:1000px; }
+  .hero{ background:linear-gradient(135deg,#1e1b4b,#312e81 40%,#4c1d95); border-radius:18px;
+    padding:38px 34px; margin-bottom:26px; border:1px solid var(--border); box-shadow:0 0 60px rgba(139,92,246,0.15);}
+  .hero h1{ font-size:27px; margin:0 0 8px; background:linear-gradient(90deg,#c4b5fd,#67e8f9);
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero p{ color:var(--muted); font-size:13.5px; margin:4px 0; }
+  .chip{ display:inline-block; background:rgba(139,92,246,0.15); color:#c4b5fd; border:1px solid rgba(139,92,246,0.4);
+    padding:5px 12px; border-radius:20px; font-size:11px; margin:8px 4px 0 0;}
+
+  .part-banner{
+    background:linear-gradient(90deg, rgba(139,92,246,0.18), rgba(34,211,238,0.08));
+    border:1px solid var(--accent); border-radius:12px; padding:16px 20px; margin:30px 0 10px;
+  }
+  .part-banner h2{ margin:0; color:#fff; font-size:20px; }
+  .part-banner p{ margin:6px 0 0; color:var(--muted); font-size:12.5px; }
+
+  section{ margin-bottom:14px; scroll-margin-top:20px; }
+  h2.section-title{ font-size:18px; color:#fff; background:var(--panel2); padding:12px 16px; border-radius:10px;
+    border-left:4px solid var(--accent); margin:26px 0 12px; display:flex; align-items:center; gap:8px;}
+  h3{ color:var(--accent2); font-size:14.5px; margin-top:18px;}
+  p{ line-height:1.65; font-size:13.5px; color:#cbd5e1; }
+  ul,ol{ font-size:13.5px; color:#cbd5e1; line-height:1.7; }
+  b{ color:#fff; }
+
+  .pattern-card{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:14px 0;}
+  .signal{ background:rgba(34,211,238,0.08); border:1px dashed rgba(34,211,238,0.4); border-radius:8px;
+    padding:8px 12px; font-size:12.5px; color:#a5f3fc; margin:10px 0;}
+  .signal b{ color:var(--accent2); }
+
+  details{ background:var(--panel2); border:1px solid var(--border); border-radius:10px; margin:10px 0; overflow:hidden;}
+  details[open]{ border-color:var(--accent); }
+  summary{ cursor:pointer; padding:11px 16px; font-weight:600; font-size:13px; color:var(--text); list-style:none;
+    display:flex; align-items:center; justify-content:space-between; background:#1a2338;}
+  summary::-webkit-details-marker{ display:none; }
+  summary::after{ content:"+"; color:var(--accent2); font-size:18px; font-weight:400; }
+  details[open] summary::after{ content:"–"; }
+  .details-body{ padding:14px 18px; }
+  .sum-left{ display:flex; align-items:center; gap:8px; }
+
+  .callout{ border-radius:10px; padding:11px 15px; margin:10px 0; font-size:12.5px; line-height:1.6; }
+  .tip{ background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.35); }
+  .tip b{ color:var(--green); }
+  .warn{ background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.35); }
+  .warn b{ color:var(--orange); }
+  .interview{ background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.35); }
+  .interview b{ color:var(--red); }
+  .analogy{ background:rgba(34,211,238,0.08); border:1px solid rgba(34,211,238,0.35); }
+  .analogy b{ color:var(--accent2); }
+
+  .diagram{ background:#05070d; border:1px solid var(--border); border-radius:10px; padding:14px;
+    font-family:'Consolas',monospace; font-size:12px; color:#67e8f9; text-align:center; white-space:pre;
+    overflow-x:auto; margin:10px 0;}
+
+  pre{ margin:0; padding:14px 16px; background:#0a0e17; color:#d4d4f4; font-size:12px; overflow-x:auto;
+    line-height:1.55; border-radius:8px; border:1px solid var(--border); }
+  code{ font-family:'Consolas','Courier New',monospace; }
+  p code, li code{ background:rgba(139,92,246,0.15); color:#c4b5fd; padding:1px 6px; border-radius:4px; font-size:12px;}
+
+  table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:12.5px; }
+  th{ background:var(--accent); color:#fff; padding:8px 10px; text-align:left; }
+  td{ padding:7px 10px; border-bottom:1px solid var(--border); color:#cbd5e1; }
+  tr:nth-child(even) td{ background:var(--panel); }
+
+  .badge{ padding:2px 9px; border-radius:12px; font-size:10px; font-weight:700; }
+  .easy{ background:rgba(52,211,153,0.15); color:var(--green); border:1px solid rgba(52,211,153,0.4); }
+  .medium{ background:rgba(251,191,36,0.15); color:var(--orange); border:1px solid rgba(251,191,36,0.4); }
+  .hard{ background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.4); }
+
+  .lc-title{ font-weight:700; color:#fff; }
+
+  .progress-wrap{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 18px; margin:14px 0;}
+  .progress-bar-bg{ background:#1e293b; border-radius:20px; height:10px; overflow:hidden; margin-top:8px;}
+  .progress-bar-fill{ background:linear-gradient(90deg,var(--accent),var(--accent2)); height:100%; width:0%; transition:width .3s;}
+  .check-item{ display:flex; align-items:center; gap:10px; padding:6px 0; font-size:13px; color:#cbd5e1;}
+  .check-item input{ width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+
+  .qa{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin:8px 0; cursor:pointer;}
+  .qa .q{ color:var(--accent2); font-weight:700; font-size:13px; }
+  .qa .a{ margin-top:6px; font-size:12.5px; color:#cbd5e1; display:none; }
+  .qa.open .a{ display:block; }
+  .qa .q::before{ content:"❯ "; color:var(--accent); }
+
+  .foot{ text-align:center; color:#5b6478; font-size:12px; margin:40px 0 10px; }
+
+  ::-webkit-scrollbar{ width:9px; height:9px; }
+  ::-webkit-scrollbar-thumb{ background:#2d3648; border-radius:10px; }
+  ::-webkit-scrollbar-track{ background:var(--bg); }
+
+  @media (max-width:800px){ body{ flex-direction:column; } #sidebar{ width:100%; height:auto; position:relative;} #main{ padding:20px; } }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h2>🔗 LL Notes (C++)</h2>
+
+  <div class="grp">Part A — Theory Basics</div>
+  <a href="#intro">1. Kya hota hai?</a>
+  <a href="#array-vs-ll">2. Array vs LL</a>
+  <a href="#node">3. Node Structure</a>
+  <a href="#types">4. Types of LL</a>
+  <a href="#basic-ops">5. Traversal/Insert/Delete</a>
+  <a href="#dll-ops">6. Doubly LL Ops</a>
+  <a href="#cll-ops">7. Circular LL Ops</a>
+  <a href="#complexity">8. Complexity Sheet</a>
+
+  <div class="grp">Part B — Patterns for LeetCode</div>
+  <a href="#cheatsheet">Pattern Recognition Table</a>
+  <a href="#p1"><span class="pnum">1</span>Dummy Node</a>
+  <a href="#p2"><span class="pnum">2</span>Fast &amp; Slow Pointer</a>
+  <a href="#p3"><span class="pnum">3</span>In-place Reversal</a>
+  <a href="#p4"><span class="pnum">4</span>Two Pointer Gap</a>
+  <a href="#p5"><span class="pnum">5</span>Merge Technique</a>
+  <a href="#p6"><span class="pnum">6</span>Recursion on LL</a>
+  <a href="#p7"><span class="pnum">7</span>HashMap on LL</a>
+  <a href="#p8"><span class="pnum">8</span>LL-based Design</a>
+
+  <div class="grp">Wrap Up</div>
+  <a href="#mistakes">Common Mistakes</a>
+  <a href="#qa">Quick Q&amp;A</a>
+  <a href="#master-list">Master Practice List</a>
+  <a href="#tracker">Progress Tracker</a>
+</div>
+
+<div id="main">
+
+  <div class="hero">
+    <h1>🔗 Linked List — Basics + Patterns (C++)</h1>
+    <p>Ek hi jagah: pehle theory concepts clear karo (Part A), phir wahi concepts patterns ke roop mein LeetCode pe apply karo (Part B).</p>
+    <div>
+      <span class="chip">Pure C++</span>
+      <span class="chip">Theory se Practice tak</span>
+      <span class="chip">8 Patterns</span>
+      <span class="chip">25+ Solved Problems</span>
+    </div>
+  </div>
+
+  <!-- ============ PART A: THEORY ============ -->
+  <div class="part-banner">
+    <h2>📘 Part A — Basic Theory &amp; Concepts</h2>
+    <p>Pehle fundamentals clear karo — node kya hai, types kya hain, basic operations kaise likhte hain. Ye foundation Part B ke patterns samajhne ke liye zaroori hai.</p>
+  </div>
+
+  <!-- 1 INTRO -->
+  <section id="intro">
+    <h2 class="section-title">1️⃣ Linked List kya hota hai?</h2>
+    <p><b>Linked List</b> ek <b>linear data structure</b> hai jisme elements (<b>nodes</b>) memory mein <b>contiguous</b> nahi hote. Har node do cheezein rakhta hai — <b>data</b> aur <b>next node ka address (pointer)</b>.</p>
+
+    <div class="diagram">HEAD
+ │
+ ▼
+┌──────┬──────┐     ┌──────┬──────┐     ┌──────┬──────┐
+│  10  │  ●───┼────▶│  20  │  ●───┼────▶│  30  │ NULL │
+└──────┴──────┘     └──────┴──────┘     └──────┴──────┘
+   Node 1               Node 2               Node 3</div>
+
+    <div class="callout analogy"><b>Samjho ise aise:</b> Treasure hunt ki tarah — har clue (node) apna hint (data) aur "agla clue kahan hai" (address) deta hai. Directly 5th clue pe jump nahi kar sakte, 1st se follow karna padta hai.</div>
+
+    <details>
+      <summary>📌 Real-life Examples dekho</summary>
+      <div class="details-body">
+        <ul>
+          <li>Music player playlist — next song ka reference</li>
+          <li>Browser history — back/forward navigation (doubly LL)</li>
+          <li>Train bogies — har bogie next se connected</li>
+          <li>LRU/LFU Cache — Doubly LL + HashMap</li>
+          <li>Hash Map collisions — chaining ke liye linked list</li>
+        </ul>
+      </div>
+    </details>
+
+    <div class="callout tip"><b>Tip:</b> "Linear" hai array jaisa (order maintain karta hai), par memory mein "linked" hai — isliye random access nahi milta, sirf sequential.</div>
+  </section>
+
+  <!-- 2 ARRAY VS LL -->
+  <section id="array-vs-ll">
+    <h2 class="section-title">2️⃣ Array vs Linked List</h2>
+    <table>
+      <tr><th>Property</th><th>Array</th><th>Linked List</th></tr>
+      <tr><td>Memory</td><td>Contiguous block</td><td>Scattered, non-contiguous</td></tr>
+      <tr><td>Size</td><td>Fixed (static)</td><td>Dynamic — grow/shrink runtime</td></tr>
+      <tr><td>Access</td><td>O(1) index based</td><td>O(n) traversal based</td></tr>
+      <tr><td>Insert/Delete at start</td><td>O(n) shifting</td><td>O(1) pointer update</td></tr>
+      <tr><td>Extra memory</td><td>Kam</td><td>Zyada (pointer store hota hai)</td></tr>
+      <tr><td>Cache locality</td><td>Achhi</td><td>Kharab</td></tr>
+    </table>
+    <div class="callout interview"><b>Interview Point:</b> Array mein insert/delete slow (O(n)) hota hai kyunki shift karna padta hai; LL mein O(1) hota hai kyunki bas pointer badalta hai — bas position tak pahunchna O(n) leta hai.</div>
+  </section>
+
+  <!-- 3 NODE -->
+  <section id="node">
+    <h2 class="section-title">3️⃣ Node Structure &amp; Representation (C++)</h2>
+    <div class="diagram">┌─────────┬─────────┐
+│  DATA   │  NEXT   │ ───▶ agle node ka address
+└─────────┴─────────┘</div>
+
+    <pre><code>struct ListNode {
+    int val;
+    ListNode* next;
+    ListNode(int x) : val(x), next(nullptr) {}
+};
+
+// Usage
+ListNode* head = new ListNode(10);
+head->next = new ListNode(20);</code></pre>
+
+    <div class="callout tip"><b>Tip:</b> LeetCode par usually struct ka naam <code>ListNode</code> hota hai aur ye pehle se diya hota hai — tumhe khud define nahi karna padta.</div>
+    <div class="callout tip"><b>Tip:</b> HEAD koi special node nahi — sirf pehle node ka address rakhne wala variable/pointer hai. Isse "kho" diya (traverse kiye bina overwrite) to poori list unreachable ho jaati hai.</div>
+  </section>
+
+  <!-- 4 TYPES -->
+  <section id="types">
+    <h2 class="section-title">4️⃣ Types of Linked List</h2>
+
+    <h3>Singly Linked List</h3>
+    <div class="diagram">HEAD ▶ [10|●]─▶[20|●]─▶[30|NULL]</div>
+    <p>Ek hi pointer — <code>next</code>. Traversal sirf forward.</p>
+
+    <h3>Doubly Linked List</h3>
+    <div class="diagram">NULL◀─[●|10|●]◀─▶[●|20|●]◀─▶[●|30|●]─▶NULL</div>
+    <pre><code>struct DoublyListNode {
+    int val;
+    DoublyListNode* prev;
+    DoublyListNode* next;
+    DoublyListNode(int x) : val(x), prev(nullptr), next(nullptr) {}
+};</code></pre>
+    <p>Do pointers — <code>next</code> aur <code>prev</code>. Traversal dono directions.</p>
+
+    <h3>Circular Linked List</h3>
+    <div class="diagram">   ┌────────────────────────────┐
+   ▼                            │
+[10|●]─▶[20|●]─▶[30|●]──────────┘
+(HEAD)</div>
+    <p>Last node NULL ki jagah wapas HEAD ko point karta hai.</p>
+
+    <table>
+      <tr><th>Type</th><th>Best Use Case</th></tr>
+      <tr><td>Singly LL</td><td>Simple traversal, stacks, most LeetCode problems</td></tr>
+      <tr><td>Doubly LL</td><td>Browser history, LRU/LFU Cache, undo-redo</td></tr>
+      <tr><td>Circular LL</td><td>Round-robin scheduling, playlist looping, Josephus problem</td></tr>
+    </table>
+  </section>
+
+  <!-- 5 BASIC OPS -->
+  <section id="basic-ops">
+    <h2 class="section-title">5️⃣ Basic Operations — Traversal, Insertion, Deletion</h2>
+
+    <h3>Traversal</h3>
+    <pre><code>void traverse(ListNode* head) {
+    ListNode* temp = head;
+    while (temp != nullptr) {
+        cout << temp->val << " ";
+        temp = temp->next;
+    }
+}</code></pre>
+
+    <h3>Length &amp; Search</h3>
+    <pre><code>int length(ListNode* head) {
+    int count = 0;
+    ListNode* temp = head;
+    while (temp) { count++; temp = temp->next; }
+    return count;
+}
+
+int search(ListNode* head, int key) {
+    ListNode* temp = head;
+    int pos = 0;
+    while (temp) {
+        if (temp->val == key) return pos;
+        temp = temp->next;
+        pos++;
+    }
+    return -1;
+}</code></pre>
+
+    <details>
+      <summary>➕ Insertion — Beginning / End / Position</summary>
+      <div class="details-body">
+<pre><code>// Insert at Beginning — O(1)
+ListNode* insertAtHead(ListNode* head, int val) {
+    ListNode* newNode = new ListNode(val);
+    newNode->next = head;
+    return newNode;
+}
+
+// Insert at End — O(n)
+ListNode* insertAtEnd(ListNode* head, int val) {
+    ListNode* newNode = new ListNode(val);
+    if (head == nullptr) return newNode;
+    ListNode* temp = head;
+    while (temp->next != nullptr) temp = temp->next;
+    temp->next = newNode;
+    return head;
+}
+
+// Insert at Position — O(n)
+ListNode* insertAtPos(ListNode* head, int pos, int val) {
+    ListNode* newNode = new ListNode(val);
+    if (pos == 0) { newNode->next = head; return newNode; }
+    ListNode* temp = head;
+    for (int i = 0; i < pos - 1; i++) temp = temp->next;
+    newNode->next = temp->next;
+    temp->next = newNode;
+    return head;
+}</code></pre>
+        <div class="callout tip"><b>Tip:</b> Agar <code>tail</code> pointer maintain karo to "insert at end" O(1) mein ho sakta hai.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>➖ Deletion — Beginning / By Value</summary>
+      <div class="details-body">
+<pre><code>// Delete from Beginning — O(1)
+ListNode* deleteHead(ListNode* head) {
+    if (head == nullptr) return nullptr;
+    ListNode* newHead = head->next;
+    delete head;
+    return newHead;
+}
+
+// Delete by Value — O(n)
+ListNode* deleteByValue(ListNode* head, int val) {
+    if (!head) return nullptr;
+    if (head->val == val) {
+        ListNode* newHead = head->next;
+        delete head;
+        return newHead;
+    }
+    ListNode* temp = head;
+    while (temp->next && temp->next->val != val) temp = temp->next;
+    if (temp->next) {
+        ListNode* toDelete = temp->next;
+        temp->next = temp->next->next;
+        delete toDelete;
+    }
+    return head;
+}</code></pre>
+        <div class="callout warn"><b>Dhyan dein:</b> Delete se pehle hamesha <code>next</code> reference save karo, warna list break ho sakti hai.</div>
+      </div>
+    </details>
+  </section>
+
+  <!-- 6 DLL OPS -->
+  <section id="dll-ops">
+    <h2 class="section-title">6️⃣ Doubly Linked List — Full Operations</h2>
+    <pre><code>DoublyListNode* insertAtHead(DoublyListNode* head, int val) {
+    DoublyListNode* n = new DoublyListNode(val);
+    n->next = head;
+    if (head != nullptr) head->prev = n;
+    return n;
+}
+
+void deleteNode(DoublyListNode* node) {
+    if (node->prev != nullptr) node->prev->next = node->next;
+    if (node->next != nullptr) node->next->prev = node->prev;
+}</code></pre>
+    <div class="callout analogy"><b>Samjho ise aise:</b> DLL train ki bogies jaisi hai — aage-peeche dono hooks hote hain, isliye beech ki bogie hatani ho to sirf uske dono connections jodne padte hain.</div>
+    <table>
+      <tr><th>Feature</th><th>Singly LL</th><th>Doubly LL</th></tr>
+      <tr><td>Backward traversal</td><td>❌</td><td>✅</td></tr>
+      <tr><td>Delete given node directly</td><td>❌ O(n)</td><td>✅ O(1)</td></tr>
+      <tr><td>Extra memory/node</td><td>1 pointer</td><td>2 pointers</td></tr>
+    </table>
+  </section>
+
+  <!-- 7 CLL OPS -->
+  <section id="cll-ops">
+    <h2 class="section-title">7️⃣ Circular Linked List — Full Operations</h2>
+    <pre><code>void traverse(ListNode* head) {
+    if (head == nullptr) return;
+    ListNode* temp = head;
+    do {
+        cout << temp->val << " ";
+        temp = temp->next;
+    } while (temp != head);
+}</code></pre>
+    <div class="callout warn"><b>Dhyan dein:</b> <code>while(temp != nullptr)</code> use karoge to infinite loop lagega — hamesha <code>while(temp != head)</code> use karo (aur pehle <code>do-while</code> se ek baar chalao).</div>
+  </section>
+
+  <!-- 8 COMPLEXITY -->
+  <section id="complexity">
+    <h2 class="section-title">8️⃣ Complexity Cheat Sheet</h2>
+    <table>
+      <tr><th>Operation</th><th>Singly LL</th><th>Doubly LL</th><th>Array</th></tr>
+      <tr><td>Access by index</td><td>O(n)</td><td>O(n)</td><td>O(1)</td></tr>
+      <tr><td>Search</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+      <tr><td>Insert at beginning</td><td>O(1)</td><td>O(1)</td><td>O(n)</td></tr>
+      <tr><td>Insert at end (tail ptr)</td><td>O(1)</td><td>O(1)</td><td>O(1)*</td></tr>
+      <tr><td>Delete at beginning</td><td>O(1)</td><td>O(1)</td><td>O(n)</td></tr>
+      <tr><td>Delete given node ref</td><td>O(n)</td><td>O(1)</td><td>—</td></tr>
+      <tr><td>Reverse</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+    </table>
+    <p style="font-size:11px;color:#666;">*amortized, dynamic array (vector) ke case mein</p>
+  </section>
+
+  <!-- ============ PART B: PATTERNS ============ -->
+  <div class="part-banner">
+    <h2>🎯 Part B — Standard Patterns for LeetCode</h2>
+    <p>Ab jab basics clear hain, yahi concepts (traversal, dummy node, reversal, DLL) 8 reusable patterns mein use hote hain jo 90% Linked List questions solve karte hain.</p>
+  </div>
+
+  <!-- CHEATSHEET -->
+  <section id="cheatsheet">
+    <h2 class="section-title">🎯 Pattern Recognition Cheat Sheet</h2>
+    <p>Question padhte hi ye keywords dhundo — pattern turant pata chal jayega:</p>
+    <table>
+      <tr><th>Question mein ye dikhe...</th><th>Pattern</th></tr>
+      <tr><td>"middle", "cycle", "loop", "happy number", "palindrome"</td><td>#2 Fast &amp; Slow Pointer</td></tr>
+      <tr><td>"reverse", "reverse between", "reverse in groups"</td><td>#3 In-place Reversal</td></tr>
+      <tr><td>"nth from end", "intersection", "rotate"</td><td>#4 Two Pointer Gap</td></tr>
+      <tr><td>"merge", "sort list", "merge k lists"</td><td>#5 Merge Technique</td></tr>
+      <tr><td>"add two numbers", "flatten", chhota recursive structure</td><td>#6 Recursion on LL</td></tr>
+      <tr><td>"random pointer", "clone", "duplicate detect"</td><td>#7 HashMap on LL</td></tr>
+      <tr><td>"design", "LRU", "LFU", "browser history"</td><td>#8 LL-based Design</td></tr>
+      <tr><td>"remove nth", "delete", "partition", head hi change ho sakta hai</td><td>#1 Dummy Node (aksar sab patterns ke saath combine hota hai)</td></tr>
+    </table>
+  </section>
+
+  <!-- PATTERN 1: DUMMY NODE -->
+  <section id="p1">
+    <h2 class="section-title">Pattern 1 — Dummy Node Technique</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> Jab HEAD khud change ho sakta hai (delete/insert operations jo pehle node ko affect karein) — edge cases handle karne ke liye ek fake "dummy" node lagao jo asli head se pehle aata hai.</div>
+
+      <h3>Template</h3>
+      <pre><code>ListNode* dummy = new ListNode(-1);
+dummy->next = head;
+ListNode* curr = dummy;
+
+// ... operations curr ke through karo ...
+
+return dummy->next;  // asli naya head</code></pre>
+
+      <div class="diagram">DUMMY -&gt; HEAD -&gt; 1 -&gt; 2 -&gt; 3 -&gt; NULL
+  ↑
+  isse hamesha ek "safe" starting point milta hai</div>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Remove Linked List Elements</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+          <p>Sabhi nodes jinki value <code>val</code> ke barabar hai, unhe delete karo.</p>
+          <pre><code>ListNode* removeElements(ListNode* head, int val) {
+    ListNode* dummy = new ListNode(-1);
+    dummy->next = head;
+    ListNode* curr = dummy;
+
+    while (curr->next != nullptr) {
+        if (curr->next->val == val) {
+            curr->next = curr->next->next;
+        } else {
+            curr = curr->next;
+        }
+    }
+    return dummy->next;
+}</code></pre>
+          <p><b>Time:</b> O(n) &nbsp; <b>Space:</b> O(1)</p>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Remove Nth Node From End</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Dummy node + two pointer gap technique (Pattern 4 se combine).</p>
+          <pre><code>ListNode* removeNthFromEnd(ListNode* head, int n) {
+    ListNode* dummy = new ListNode(-1);
+    dummy->next = head;
+    ListNode* fast = dummy;
+    ListNode* slow = dummy;
+
+    for (int i = 0; i < n; i++) fast = fast->next;
+
+    while (fast->next != nullptr) {
+        fast = fast->next;
+        slow = slow->next;
+    }
+    slow->next = slow->next->next;
+    return dummy->next;
+}</code></pre>
+          <p><b>Time:</b> O(n) &nbsp; <b>Space:</b> O(1) &nbsp; — single pass mein solve hota hai</p>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Partition List</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>List ko x se chhote aur x se bade/barabar mein partition karo, order maintain karke. Do dummy lists banao aur end mein join karo.</p>
+          <pre><code>ListNode* partition(ListNode* head, int x) {
+    ListNode* smallDummy = new ListNode(-1);
+    ListNode* bigDummy = new ListNode(-1);
+    ListNode* small = smallDummy;
+    ListNode* big = bigDummy;
+
+    while (head != nullptr) {
+        if (head->val < x) {
+            small->next = head;
+            small = small->next;
+        } else {
+            big->next = head;
+            big = big->next;
+        }
+        head = head->next;
+    }
+    big->next = nullptr;      // zaroori hai warna cycle ban sakta hai
+    small->next = bigDummy->next;
+    return smallDummy->next;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> Jis bhi problem mein "head delete ho sakta hai" ya "multiple lists merge karke ek banani hai", wahan dummy node laga do — code bohot clean ho jaata hai aur edge case bugs kam hote hain.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 2: FAST SLOW -->
+  <section id="p2">
+    <h2 class="section-title">Pattern 2 — Fast &amp; Slow Pointer (Floyd's)</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "middle", "cycle/loop detect", "palindrome", "happy number" — jahan bhi list ko ek hi pass mein 2 alag speed se traverse karna ho.</div>
+
+      <h3>Template</h3>
+      <pre><code>ListNode* slow = head;
+ListNode* fast = head;
+
+while (fast != nullptr && fast->next != nullptr) {
+    slow = slow->next;
+    fast = fast->next->next;
+    // yahan slow == fast check karke cycle detect kar sakte ho
+}
+// loop khatam hone par slow = middle node hota hai</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Middle of the Linked List</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>ListNode* middleNode(ListNode* head) {
+    ListNode* slow = head;
+    ListNode* fast = head;
+    while (fast != nullptr && fast->next != nullptr) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    return slow;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Linked List Cycle</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>bool hasCycle(ListNode* head) {
+    ListNode* slow = head;
+    ListNode* fast = head;
+    while (fast != nullptr && fast->next != nullptr) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) return true;
+    }
+    return false;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Linked List Cycle II</span> (cycle ka start point)</span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Pehle meeting point dhundo, phir ek pointer HEAD se, dusra meeting point se — same speed se chalao, jahan milein wahi cycle start hai.</p>
+<pre><code>ListNode* detectCycle(ListNode* head) {
+    ListNode* slow = head;
+    ListNode* fast = head;
+    bool cyclePresent = false;
+
+    while (fast != nullptr && fast->next != nullptr) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) { cyclePresent = true; break; }
+    }
+    if (!cyclePresent) return nullptr;
+
+    slow = head;
+    while (slow != fast) {
+        slow = slow->next;
+        fast = fast->next;
+    }
+    return slow;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Palindrome Linked List</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+          <p>Middle dhundo → dusra half reverse karo (Pattern 3) → compare karo.</p>
+<pre><code>bool isPalindrome(ListNode* head) {
+    if (!head || !head->next) return true;
+
+    // Step 1: middle dhundo
+    ListNode* slow = head;
+    ListNode* fast = head;
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+
+    // Step 2: dusra half reverse karo
+    ListNode* prev = nullptr;
+    ListNode* curr = slow;
+    while (curr) {
+        ListNode* nextTemp = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = nextTemp;
+    }
+
+    // Step 3: compare karo
+    ListNode* p1 = head;
+    ListNode* p2 = prev;
+    while (p2) {
+        if (p1->val != p2->val) return false;
+        p1 = p1->next;
+        p2 = p2->next;
+    }
+    return true;
+}</code></pre>
+          <p><b>Time:</b> O(n) &nbsp; <b>Space:</b> O(1) — ye 3 patterns (fast-slow + reversal + two pointer compare) ka combo hai.</p>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Fast-slow pointer aksar akela nahi aata — palindrome jaise questions mein iske saath Pattern 3 (Reversal) bhi combine hota hai. Combos pehchan na seekho.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 3: REVERSAL -->
+  <section id="p3">
+    <h2 class="section-title">Pattern 3 — In-place Reversal</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "reverse", "reverse between L and R", "reverse in groups of K" — jab bhi pointers ki direction palatni ho, extra space use kiye bina.</div>
+
+      <h3>Template (3-pointer technique)</h3>
+      <pre><code>ListNode* prev = nullptr;
+ListNode* curr = head;
+
+while (curr != nullptr) {
+    ListNode* nextTemp = curr->next;  // 1. next save karo
+    curr->next = prev;                // 2. link reverse karo
+    prev = curr;                      // 3. prev aage badhao
+    curr = nextTemp;                  // 4. curr aage badhao
+}
+// prev ab naya head hai</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Reverse Linked List</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>ListNode* reverseList(ListNode* head) {
+    ListNode* prev = nullptr;
+    ListNode* curr = head;
+    while (curr != nullptr) {
+        ListNode* nextTemp = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = nextTemp;
+    }
+    return prev;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Reverse Linked List II</span> (position left se right tak)</span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Sirf left..right range reverse karni hai, baaki list waisi hi rehni chahiye.</p>
+<pre><code>ListNode* reverseBetween(ListNode* head, int left, int right) {
+    ListNode* dummy = new ListNode(-1);
+    dummy->next = head;
+    ListNode* prev = dummy;
+
+    for (int i = 0; i < left - 1; i++) prev = prev->next;
+
+    ListNode* curr = prev->next;
+    for (int i = 0; i < right - left; i++) {
+        ListNode* nextTemp = curr->next;
+        curr->next = nextTemp->next;
+        nextTemp->next = prev->next;
+        prev->next = nextTemp;
+    }
+    return dummy->next;
+}</code></pre>
+          <p><b>Trick:</b> "insert front" technique — har node ko range ke start pe le aao (dummy node ke saath combine).</p>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🔴 <span class="lc-title">Reverse Nodes in k-Group</span></span><span class="badge hard">Hard</span></summary>
+        <div class="details-body">
+          <p>Pehle check karo K nodes available hain, tabhi reverse karo — recursion se agla group solve karo.</p>
+<pre><code>ListNode* reverseKGroup(ListNode* head, int k) {
+    ListNode* curr = head;
+    int count = 0;
+    while (curr != nullptr && count < k) {
+        curr = curr->next;
+        count++;
+    }
+    if (count < k) return head;   // group incomplete, chhod do
+
+    ListNode* prev = reverseKGroup(curr, k);  // agla group pehle solve
+    curr = head;
+    while (count-- > 0) {
+        ListNode* nextTemp = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = nextTemp;
+    }
+    return prev;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> Reversal pattern ka base "3-pointer template" itna important hai ki isse bina dekhe likhna aana chahiye — 80% reversal-based hard problems isi template ka extension hote hain.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 4: TWO POINTER GAP -->
+  <section id="p4">
+    <h2 class="section-title">Pattern 4 — Two Pointer with Gap</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "nth from end", "intersection of two lists", "rotate list" — jahan do pointers ko fix gap ya smart switching ke through synchronize karna ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Intersection of Two Linked Lists</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+          <p>Dono pointers apni list khatam hone pe dusri list ke head pe switch ho jaate hain — length difference automatically balance ho jaata hai.</p>
+<pre><code>ListNode* getIntersectionNode(ListNode* headA, ListNode* headB) {
+    if (!headA || !headB) return nullptr;
+    ListNode* a = headA;
+    ListNode* b = headB;
+
+    while (a != b) {
+        a = (a == nullptr) ? headB : a->next;
+        b = (b == nullptr) ? headA : b->next;
+    }
+    return a;   // intersection node ya nullptr
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Rotate List</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>List ko circular banao, phir sahi jagah se todo.</p>
+<pre><code>ListNode* rotateRight(ListNode* head, int k) {
+    if (!head || !head->next || k == 0) return head;
+
+    int len = 1;
+    ListNode* tail = head;
+    while (tail->next) { tail = tail->next; len++; }
+
+    k = k % len;
+    if (k == 0) return head;
+
+    tail->next = head;               // circular bana do
+    int stepsToNewTail = len - k;
+    ListNode* newTail = head;
+    for (int i = 1; i < stepsToNewTail; i++) newTail = newTail->next;
+
+    ListNode* newHead = newTail->next;
+    newTail->next = nullptr;         // break karo
+    return newHead;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> "Nth from end" wale saare problems mein soch lo — "gap of N banao, phir dono ek saath chalao" — ye ek hi core idea baar baar reuse hota hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 5: MERGE -->
+  <section id="p5">
+    <h2 class="section-title">Pattern 5 — Merge Technique</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "merge two sorted lists", "merge k sorted lists", "sort list" — jahan do ya zyada sorted lists ko combine karna ho.</div>
+
+      <h3>Template — Merge Two Sorted Lists</h3>
+      <pre><code>ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+    ListNode* dummy = new ListNode(-1);
+    ListNode* tail = dummy;
+
+    while (l1 != nullptr && l2 != nullptr) {
+        if (l1->val <= l2->val) {
+            tail->next = l1;
+            l1 = l1->next;
+        } else {
+            tail->next = l2;
+            l2 = l2->next;
+        }
+        tail = tail->next;
+    }
+    tail->next = (l1 != nullptr) ? l1 : l2;
+    return dummy->next;
+}</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🔴 <span class="lc-title">Merge k Sorted Lists</span></span><span class="badge hard">Hard</span></summary>
+        <div class="details-body">
+          <p>Divide &amp; conquer se pairs mein merge karte jao — jaise merge sort mein hota hai.</p>
+<pre><code>ListNode* mergeKLists(vector&lt;ListNode*&gt;&amp; lists) {
+    if (lists.empty()) return nullptr;
+    while (lists.size() > 1) {
+        vector&lt;ListNode*&gt; merged;
+        for (int i = 0; i < lists.size(); i += 2) {
+            ListNode* l1 = lists[i];
+            ListNode* l2 = (i + 1 < lists.size()) ? lists[i + 1] : nullptr;
+            merged.push_back(mergeTwoLists(l1, l2));
+        }
+        lists = merged;
+    }
+    return lists[0];
+}</code></pre>
+          <p><b>Time:</b> O(N log k) jahan N total nodes hain aur k number of lists</p>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Sort List</span> (Merge Sort on LL)</span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Fast-slow pointer se list split karo (Pattern 2), recursively sort karo, phir merge karo (Pattern 5).</p>
+<pre><code>ListNode* sortList(ListNode* head) {
+    if (!head || !head->next) return head;
+
+    ListNode* slow = head;
+    ListNode* fast = head->next;
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    ListNode* mid = slow->next;
+    slow->next = nullptr;
+
+    ListNode* left = sortList(head);
+    ListNode* right = sortList(mid);
+    return mergeTwoLists(left, right);
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> "Merge k Sorted Lists" ko heap (priority_queue) se O(N log k) mein bhi solve kar sakte ho — dono approaches jaanna interview mein plus point hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 6: RECURSION -->
+  <section id="p6">
+    <h2 class="section-title">Pattern 6 — Recursion on Linked List</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> Jab problem "list ke chhote version pe solve karke wapas combine" karne se solve ho — reverse, add numbers, flatten jaise problems mein.</div>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Reverse Linked List (Recursive version)</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>ListNode* reverseList(ListNode* head) {
+    if (!head || !head->next) return head;
+
+    ListNode* newHead = reverseList(head->next);
+    head->next->next = head;
+    head->next = nullptr;
+    return newHead;
+}</code></pre>
+          <p><b>Space:</b> O(n) call stack ki wajah se — iterative version O(1) leta hai.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Add Two Numbers</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Numbers reverse order mein linked list mein stored hain — carry track karte hue add karo.</p>
+<pre><code>ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+    ListNode* dummy = new ListNode(-1);
+    ListNode* curr = dummy;
+    int carry = 0;
+
+    while (l1 != nullptr || l2 != nullptr || carry != 0) {
+        int sum = carry;
+        if (l1) { sum += l1->val; l1 = l1->next; }
+        if (l2) { sum += l2->val; l2 = l2->next; }
+
+        carry = sum / 10;
+        curr->next = new ListNode(sum % 10);
+        curr = curr->next;
+    }
+    return dummy->next;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Flatten a Multilevel Doubly Linked List</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>Node* flatten(Node* head) {
+    Node* curr = head;
+    while (curr != nullptr) {
+        if (curr->child != nullptr) {
+            Node* next = curr->next;
+            Node* childHead = flatten(curr->child);
+
+            curr->next = childHead;
+            childHead->prev = curr;
+            curr->child = nullptr;
+
+            Node* tail = childHead;
+            while (tail->next != nullptr) tail = tail->next;
+
+            tail->next = next;
+            if (next != nullptr) next->prev = tail;
+        }
+        curr = curr->next;
+    }
+    return head;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout warn"><b>Dhyan dein:</b> Recursion likhne se pehle 2 cheezein sochlo — <b>base case</b> kya hai (kab rukna hai) aur <b>recursive call ke baad kya combine</b> karna hai. Ye pattern har recursive LL problem mein repeat hota hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 7: HASHMAP -->
+  <section id="p7">
+    <h2 class="section-title">Pattern 7 — HashMap / HashSet on Linked List</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "clone with random pointer", "duplicate detect", jab O(n) extra space allowed ho aur node-to-node mapping chahiye ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Copy List with Random Pointer</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>HashMap mein original node → clone node ka mapping store karo, phir dono passes mein next/random set karo.</p>
+<pre><code>Node* copyRandomList(Node* head) {
+    if (!head) return nullptr;
+    unordered_map&lt;Node*, Node*&gt; mp;
+
+    Node* curr = head;
+    while (curr) {
+        mp[curr] = new Node(curr->val);
+        curr = curr->next;
+    }
+
+    curr = head;
+    while (curr) {
+        mp[curr]->next = mp[curr->next];
+        mp[curr]->random = mp[curr->random];
+        curr = curr->next;
+    }
+    return mp[head];
+}</code></pre>
+          <p><b>Time:</b> O(n) &nbsp; <b>Space:</b> O(n) — HashMap ki wajah se. O(1) space wala interleaving trick harder variant hai.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Linked List Cycle (HashSet approach)</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+          <p>Fast-slow se alag, "visited node" HashSet mein daal ke bhi cycle detect kar sakte ho — thoda extra space lagta hai, but samajhna easy hai.</p>
+<pre><code>bool hasCycle(ListNode* head) {
+    unordered_set&lt;ListNode*&gt; visited;
+    ListNode* curr = head;
+    while (curr) {
+        if (visited.count(curr)) return true;
+        visited.insert(curr);
+        curr = curr->next;
+    }
+    return false;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Interview mein pehle HashMap approach batao (samajhne mein easy), phir bolo "O(1) space mein bhi ho sakta hai" — isse pata chalta hai tumhe dono trade-offs ka pata hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 8: DESIGN -->
+  <section id="p8">
+    <h2 class="section-title">Pattern 8 — Linked List based Design</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "design", "LRU Cache", "LFU Cache" — jahan Doubly Linked List + HashMap combine karke O(1) operations chahiye hote hain.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">LRU Cache</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>DLL se use-order maintain karo (head = most recent, tail = least recent), HashMap se O(1) mein node dhundo.</p>
+<pre><code>class LRUCache {
+    struct Node {
+        int key, val;
+        Node* prev; Node* next;
+        Node(int k, int v) : key(k), val(v), prev(nullptr), next(nullptr) {}
+    };
+
+    int capacity;
+    unordered_map&lt;int, Node*&gt; mp;
+    Node* head; Node* tail;
+
+    void remove(Node* node) {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+    void insertAtHead(Node* node) {
+        node->next = head->next;
+        node->prev = head;
+        head->next->prev = node;
+        head->next = node;
+    }
+
+public:
+    LRUCache(int cap) {
+        capacity = cap;
+        head = new Node(-1, -1);
+        tail = new Node(-1, -1);
+        head->next = tail;
+        tail->prev = head;
+    }
+
+    int get(int key) {
+        if (mp.find(key) == mp.end()) return -1;
+        Node* node = mp[key];
+        remove(node);
+        insertAtHead(node);
+        return node->val;
+    }
+
+    void put(int key, int value) {
+        if (mp.find(key) != mp.end()) {
+            remove(mp[key]);
+            mp.erase(key);
+        }
+        if (mp.size() == capacity) {
+            Node* lru = tail->prev;
+            remove(lru);
+            mp.erase(lru->key);
+            delete lru;
+        }
+        Node* newNode = new Node(key, value);
+        insertAtHead(newNode);
+        mp[key] = newNode;
+    }
+};</code></pre>
+          <p><b>get() aur put() dono O(1)</b> — ye pattern top asked design question hai (Amazon, Google, Microsoft).</p>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> LRU Cache banate waqt <b>dummy head + dummy tail</b> dono use karo (jaisa Pattern 1 mein tha) — isse edge cases (empty cache, single node) automatically handle ho jaate hain.</div>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section id="mistakes">
+    <h2 class="section-title">⚠️ Common Mistakes &amp; Interview Tips</h2>
+    <ul>
+      <li>NULL check bhool jaana — hamesha edge cases pehle handle karo</li>
+      <li>Delete se pehle <code>next</code> save na karna → list break</li>
+      <li>Circular LL mein <code>while(temp != nullptr)</code> use karna → infinite loop</li>
+      <li>Reversal mein pointer update order galat rakhna</li>
+      <li>Dummy node use na karna jab head khud change ho sakta ho</li>
+      <li>Fast pointer condition mein <code>fast->next</code> check bhool jaana → crash (segfault)</li>
+    </ul>
+    <div class="callout warn"><b>Dhyan dein:</b> Interview mein pehle diagram bana kar dry run karo — pointer manipulation visualize kiye bina galti hona common hai.</div>
+  </section>
+
+  <!-- QA -->
+  <section id="qa">
+    <h2 class="section-title">🧠 Quick Revision — Click to Reveal</h2>
+
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Kaise pehchanein kaunsa pattern use karna hai?</div>
+      <div class="a">Question ke keywords dekho (Cheat Sheet table use karo). Aksar 1 se zyada pattern combine hote hain — jaise Palindrome check mein Fast-Slow + Reversal dono lagte hain.</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Dummy Node hamesha use karna chahiye kya?</div>
+      <div class="a">Nahi — sirf tab jab head khud change ho sakta ho (delete/insert at start ya multiple merges). Simple traversal-only problems mein zaroorat nahi.</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Iterative vs Recursive reversal — interview mein kya bolna better hai?</div>
+      <div class="a">Dono bata do. Iterative O(1) space leta hai (better), Recursive O(n) space leta hai but code chhota hota hai. Interviewer trade-off jaanna chahta hai.</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">HashMap approach kab avoid karni chahiye?</div>
+      <div class="a">Jab interviewer explicitly O(1) space maange, ya "follow-up: can you do it without extra space?" pooche — tab pointer-based (fast-slow, reversal) approach use karo.</div>
+    </div>
+  </section>
+
+  <!-- MASTER LIST -->
+  <section id="master-list">
+    <h2 class="section-title">📋 Master Practice List (Pattern-wise)</h2>
+    <table>
+      <tr><th>#</th><th>Problem</th><th>Pattern</th><th>Level</th></tr>
+      <tr><td>1</td><td>Remove Linked List Elements</td><td>#1 Dummy Node</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>2</td><td>Middle of the Linked List</td><td>#2 Fast-Slow</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>3</td><td>Linked List Cycle</td><td>#2 Fast-Slow</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>4</td><td>Reverse Linked List</td><td>#3 Reversal</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>5</td><td>Palindrome Linked List</td><td>#2 + #3 Combo</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>6</td><td>Intersection of Two Linked Lists</td><td>#4 Two Pointer Gap</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>7</td><td>Merge Two Sorted Lists</td><td>#5 Merge</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>8</td><td>Remove Nth Node From End</td><td>#1 + #4 Combo</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>9</td><td>Reverse Linked List II</td><td>#3 Reversal</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>10</td><td>Linked List Cycle II</td><td>#2 Fast-Slow</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>11</td><td>Rotate List</td><td>#4 Two Pointer Gap</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>12</td><td>Partition List</td><td>#1 Dummy Node</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>13</td><td>Sort List</td><td>#2 + #5 Combo</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>14</td><td>Add Two Numbers</td><td>#6 Recursion/Iterative</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>15</td><td>Copy List with Random Pointer</td><td>#7 HashMap</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>16</td><td>Odd Even Linked List</td><td>#1 Dummy Node</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>17</td><td>Swap Nodes in Pairs</td><td>#3 Reversal</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>18</td><td>Reorder List</td><td>#2 + #3 + #5 Combo</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>19</td><td>Flatten a Multilevel DLL</td><td>#6 Recursion</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>20</td><td>LRU Cache</td><td>#8 Design</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>21</td><td>Insertion Sort List</td><td>#1 Dummy Node</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>22</td><td>Reverse Nodes in k-Group</td><td>#3 Reversal</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>23</td><td>Merge k Sorted Lists</td><td>#5 Merge</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>24</td><td>LFU Cache</td><td>#8 Design (Advanced)</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>25</td><td>Copy List with Random Pointer (O(1) space)</td><td>#7 Advanced</td><td><span class="badge hard">Hard</span></td></tr>
+    </table>
+    <div class="callout tip"><b>Tip:</b> In 25 problems ko 2 baar solve karo (ek baar dekh kar, ek baar bina dekhe) — isse pattern muscle-memory ban jaata hai aur naye unseen questions bhi crack ho jaate hain.</div>
+  </section>
+
+  <!-- TRACKER -->
+  <section id="tracker">
+    <h2 class="section-title">📊 Progress Tracker</h2>
+    <div class="progress-wrap">
+      <p style="margin:0; color:#fff; font-weight:600;">Progress: <span id="progress-text">0 / 12</span></p>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+      <div style="margin-top:14px;">
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Theory — Node structure, Types (SLL/DLL/CLL)</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Theory — Basic Insertion/Deletion likh sakta/sakti hoon</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Theory — DLL aur CLL operations clear hain</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 1 — Dummy Node</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 2 — Fast &amp; Slow Pointer</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 3 — In-place Reversal</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 4 — Two Pointer Gap</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 5 — Merge Technique</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 6 — Recursion on LL</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 7 — HashMap on LL</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 8 — LL-based Design</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Kam se kam 15 LeetCode problems solve kiye</div>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">✨ Theory se Pattern tak — ab practice shuru karo. Consistency is the key! ✨</p>
+</div>
+
+<script>
+function updateProgress(){
+  const boxes = document.querySelectorAll('.check-item input');
+  let checked = 0;
+  boxes.forEach(b => { if(b.checked) checked++; });
+  document.getElementById('progress-text').innerText = checked + ' / ' + boxes.length;
+  document.getElementById('progress-fill').style.width = (checked/boxes.length*100) + '%';
+}
+</script>
+
+</body>
+</html>

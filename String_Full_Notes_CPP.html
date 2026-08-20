@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>String — Basics + Patterns (C++) — Complete Notes</title>
+<style>
+  :root{
+    --bg:#0b0f19; --panel:#121826; --panel2:#161f30; --border:#232d42;
+    --accent:#8b5cf6; --accent2:#22d3ee; --accent3:#f472b6;
+    --green:#34d399; --orange:#fbbf24; --red:#f87171;
+    --text:#e2e8f0; --muted:#94a3b8;
+  }
+  *{box-sizing:border-box; scroll-behavior:smooth;}
+  body{ margin:0; background:var(--bg); color:var(--text);
+    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; display:flex; min-height:100vh; }
+
+  #sidebar{ width:260px; min-width:260px; background:var(--panel);
+    border-right:1px solid var(--border); padding:18px 12px;
+    position:sticky; top:0; height:100vh; overflow-y:auto; }
+  #sidebar h2{ font-size:14px; color:var(--accent2); margin:4px 6px 14px; letter-spacing:0.5px;}
+  #sidebar a{ display:block; color:var(--muted); text-decoration:none; font-size:12.5px;
+    padding:7px 10px; border-radius:8px; margin-bottom:2px; transition:0.15s; border-left:3px solid transparent;}
+  #sidebar a:hover{ background:var(--panel2); color:var(--text); border-left:3px solid var(--accent);}
+  #sidebar .grp{ color:#5b6478; font-size:10.5px; text-transform:uppercase; letter-spacing:1px; margin:14px 8px 4px;}
+  #sidebar .pnum{ display:inline-block; background:var(--accent); color:#fff; font-size:9.5px; font-weight:700;
+    width:16px; height:16px; border-radius:4px; text-align:center; line-height:16px; margin-right:6px;}
+
+  #main{ flex:1; padding:30px 40px; max-width:1000px; }
+  .hero{ background:linear-gradient(135deg,#1e1b4b,#312e81 40%,#4c1d95); border-radius:18px;
+    padding:38px 34px; margin-bottom:26px; border:1px solid var(--border); box-shadow:0 0 60px rgba(139,92,246,0.15);}
+  .hero h1{ font-size:27px; margin:0 0 8px; background:linear-gradient(90deg,#c4b5fd,#67e8f9);
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero p{ color:var(--muted); font-size:13.5px; margin:4px 0; }
+  .chip{ display:inline-block; background:rgba(139,92,246,0.15); color:#c4b5fd; border:1px solid rgba(139,92,246,0.4);
+    padding:5px 12px; border-radius:20px; font-size:11px; margin:8px 4px 0 0;}
+
+  .part-banner{ background:linear-gradient(90deg, rgba(139,92,246,0.18), rgba(34,211,238,0.08));
+    border:1px solid var(--accent); border-radius:12px; padding:16px 20px; margin:30px 0 10px;}
+  .part-banner h2{ margin:0; color:#fff; font-size:20px; }
+  .part-banner p{ margin:6px 0 0; color:var(--muted); font-size:12.5px; }
+
+  section{ margin-bottom:14px; scroll-margin-top:20px; }
+  h2.section-title{ font-size:18px; color:#fff; background:var(--panel2); padding:12px 16px; border-radius:10px;
+    border-left:4px solid var(--accent); margin:26px 0 12px; display:flex; align-items:center; gap:8px;}
+  h3{ color:var(--accent2); font-size:14.5px; margin-top:18px;}
+  p{ line-height:1.65; font-size:13.5px; color:#cbd5e1; }
+  ul,ol{ font-size:13.5px; color:#cbd5e1; line-height:1.7; }
+  b{ color:#fff; }
+
+  .pattern-card{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:14px 0;}
+  .signal{ background:rgba(34,211,238,0.08); border:1px dashed rgba(34,211,238,0.4); border-radius:8px;
+    padding:8px 12px; font-size:12.5px; color:#a5f3fc; margin:10px 0;}
+  .signal b{ color:var(--accent2); }
+
+  details{ background:var(--panel2); border:1px solid var(--border); border-radius:10px; margin:10px 0; overflow:hidden;}
+  details[open]{ border-color:var(--accent); }
+  summary{ cursor:pointer; padding:11px 16px; font-weight:600; font-size:13px; color:var(--text); list-style:none;
+    display:flex; align-items:center; justify-content:space-between; background:#1a2338;}
+  summary::-webkit-details-marker{ display:none; }
+  summary::after{ content:"+"; color:var(--accent2); font-size:18px; font-weight:400; }
+  details[open] summary::after{ content:"–"; }
+  .details-body{ padding:14px 18px; }
+  .sum-left{ display:flex; align-items:center; gap:8px; }
+
+  .callout{ border-radius:10px; padding:11px 15px; margin:10px 0; font-size:12.5px; line-height:1.6; }
+  .tip{ background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.35); }
+  .tip b{ color:var(--green); }
+  .warn{ background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.35); }
+  .warn b{ color:var(--orange); }
+  .interview{ background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.35); }
+  .interview b{ color:var(--red); }
+  .analogy{ background:rgba(34,211,238,0.08); border:1px solid rgba(34,211,238,0.35); }
+  .analogy b{ color:var(--accent2); }
+
+  .diagram{ background:#05070d; border:1px solid var(--border); border-radius:10px; padding:14px;
+    font-family:'Consolas',monospace; font-size:12px; color:#67e8f9; text-align:center; white-space:pre;
+    overflow-x:auto; margin:10px 0;}
+
+  pre{ margin:0; padding:14px 16px; background:#0a0e17; color:#d4d4f4; font-size:12px; overflow-x:auto;
+    line-height:1.55; border-radius:8px; border:1px solid var(--border); }
+  code{ font-family:'Consolas','Courier New',monospace; }
+  p code, li code{ background:rgba(139,92,246,0.15); color:#c4b5fd; padding:1px 6px; border-radius:4px; font-size:12px;}
+
+  table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:12.5px; }
+  th{ background:var(--accent); color:#fff; padding:8px 10px; text-align:left; }
+  td{ padding:7px 10px; border-bottom:1px solid var(--border); color:#cbd5e1; }
+  tr:nth-child(even) td{ background:var(--panel); }
+
+  .badge{ padding:2px 9px; border-radius:12px; font-size:10px; font-weight:700; }
+  .easy{ background:rgba(52,211,153,0.15); color:var(--green); border:1px solid rgba(52,211,153,0.4); }
+  .medium{ background:rgba(251,191,36,0.15); color:var(--orange); border:1px solid rgba(251,191,36,0.4); }
+  .hard{ background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.4); }
+
+  .lc-title{ font-weight:700; color:#fff; }
+
+  .progress-wrap{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 18px; margin:14px 0;}
+  .progress-bar-bg{ background:#1e293b; border-radius:20px; height:10px; overflow:hidden; margin-top:8px;}
+  .progress-bar-fill{ background:linear-gradient(90deg,var(--accent),var(--accent2)); height:100%; width:0%; transition:width .3s;}
+  .check-item{ display:flex; align-items:center; gap:10px; padding:6px 0; font-size:13px; color:#cbd5e1;}
+  .check-item input{ width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+
+  .qa{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin:8px 0; cursor:pointer;}
+  .qa .q{ color:var(--accent2); font-weight:700; font-size:13px; }
+  .qa .a{ margin-top:6px; font-size:12.5px; color:#cbd5e1; display:none; }
+  .qa.open .a{ display:block; }
+  .qa .q::before{ content:"❯ "; color:var(--accent); }
+
+  .foot{ text-align:center; color:#5b6478; font-size:12px; margin:40px 0 10px; }
+
+  ::-webkit-scrollbar{ width:9px; height:9px; }
+  ::-webkit-scrollbar-thumb{ background:#2d3648; border-radius:10px; }
+  ::-webkit-scrollbar-track{ background:var(--bg); }
+
+  @media (max-width:800px){ body{ flex-direction:column; } #sidebar{ width:100%; height:auto; position:relative;} #main{ padding:20px; } }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h2>🔤 String Notes (C++)</h2>
+
+  <div class="grp">Part A — Theory Basics</div>
+  <a href="#intro">1. Kya hota hai?</a>
+  <a href="#memory">2. Mutable vs Immutable</a>
+  <a href="#builtin">3. Useful Built-in Functions</a>
+  <a href="#basic-ops">4. Traversal/Compare/Concat</a>
+  <a href="#ascii">5. Character/ASCII Manipulation</a>
+  <a href="#complexity">6. Complexity Sheet</a>
+
+  <div class="grp">Part B — Patterns for LeetCode</div>
+  <a href="#cheatsheet">Pattern Recognition Table</a>
+  <a href="#p1"><span class="pnum">1</span>Two Pointers</a>
+  <a href="#p2"><span class="pnum">2</span>Sliding Window</a>
+  <a href="#p3"><span class="pnum">3</span>Hashing / Frequency Count</a>
+  <a href="#p4"><span class="pnum">4</span>Sorting-based</a>
+  <a href="#p5"><span class="pnum">5</span>Stack-based</a>
+  <a href="#p6"><span class="pnum">6</span>Dynamic Programming</a>
+  <a href="#p7"><span class="pnum">7</span>Backtracking</a>
+  <a href="#p8"><span class="pnum">8</span>String Matching (KMP)</a>
+
+  <div class="grp">Wrap Up</div>
+  <a href="#mistakes">Common Mistakes</a>
+  <a href="#qa">Quick Q&amp;A</a>
+  <a href="#master-list">Master Practice List</a>
+  <a href="#tracker">Progress Tracker</a>
+</div>
+
+<div id="main">
+
+  <div class="hero">
+    <h1>🔤 String — Basics + Patterns (C++)</h1>
+    <p>Ek hi jagah: pehle theory concepts clear karo (Part A), phir wahi concepts patterns ke roop mein LeetCode pe apply karo (Part B).</p>
+    <div>
+      <span class="chip">Pure C++</span>
+      <span class="chip">Theory se Practice tak</span>
+      <span class="chip">8 Patterns</span>
+      <span class="chip">28+ Solved Problems</span>
+    </div>
+  </div>
+
+  <!-- ============ PART A: THEORY ============ -->
+  <div class="part-banner">
+    <h2>📘 Part A — Basic Theory &amp; Concepts</h2>
+    <p>Pehle fundamentals clear karo — string memory mein kaise store hoti hai, built-in functions, character manipulation. Ye foundation Part B ke patterns samajhne ke liye zaroori hai.</p>
+  </div>
+
+  <!-- 1 INTRO -->
+  <section id="intro">
+    <h2 class="section-title">1️⃣ String kya hoti hai?</h2>
+    <p>C++ mein <b>string</b> characters ka ek <b>sequence</b> hai, jo internally <code>char</code> array ki tarah hi contiguous memory mein store hoti hai. C++ ki <code>std::string</code> class (STL) automatically memory manage karti hai — size dynamic hoti hai, jaise <code>vector&lt;char&gt;</code>.</p>
+
+    <div class="diagram">Index:    0    1    2    3    4
+        ┌────┬────┬────┬────┬────┐
+String: │ 'h'│ 'e'│ 'l'│ 'l'│ 'o'│
+        └────┴────┴────┴────┴────┘</div>
+
+    <div class="callout analogy"><b>Samjho ise aise:</b> String ek Array hi hai, bas isme <code>char</code> elements hote hain aur STL kuch extra helper functions (substr, find, compare) provide karta hai. Isliye jo patterns Array pe kaam karte hain (Two Pointers, Sliding Window), wahi String pe bhi seedhe apply hote hain.</div>
+
+    <pre><code>#include &lt;string&gt;
+using namespace std;
+
+string s = "hello";
+cout << s.length();     // 5, string ki size
+cout << s[0];             // 'h', index se access — O(1)</code></pre>
+  </section>
+
+  <!-- 2 MUTABLE -->
+  <section id="memory">
+    <h2 class="section-title">2️⃣ C++ string: Mutable hai</h2>
+    <p>Java/Python ke unlike, C++ ki <code>std::string</code> <b>mutable</b> hai — matlab tum directly characters modify kar sakte ho bina naya string banaye.</p>
+    <pre><code>string s = "hello";
+s[0] = 'H';        // valid — s ab "Hello" hai
+s += " world";     // concatenation, in-place grow hota hai</code></pre>
+    <div class="callout tip"><b>Tip:</b> Ye C++ ka bada advantage hai — string problems mein tum in-place modification (jaise reverse, swap characters) kar sakte ho bina extra space liye, jo Java/Python mein possible nahi (unke strings immutable hain).</div>
+  </section>
+
+  <!-- 3 BUILTIN -->
+  <section id="builtin">
+    <h2 class="section-title">3️⃣ Useful Built-in Functions</h2>
+    <pre><code>string s = "hello world";
+
+s.length();              // ya s.size() -> 11
+s.substr(6);              // "world" (index 6 se end tak)
+s.substr(0, 5);           // "hello" (index 0 se 5 characters)
+s.find("world");          // 6 (index jahan mila), agar na mile to string::npos
+s.find("xyz");             // string::npos
+
+reverse(s.begin(), s.end());   // in-place reverse (algorithm header)
+sort(s.begin(), s.end());       // in-place sort characters
+
+s.append("!");            // s += "!" jaisa hi
+s.erase(0, 6);              // "hello " hata do, "world" bache
+s.insert(5, "!!!");        // position 5 pe insert
+
+stoi("123");                // string -> int
+to_string(123);             // int -> string
+
+s.push_back('!');           // end mein character add
+s.pop_back();                // end se character remove</code></pre>
+    <div class="callout tip"><b>Tip:</b> <code>#include &lt;string&gt;</code> aur <code>#include &lt;algorithm&gt;</code> dono include karo — <code>reverse()</code>, <code>sort()</code> jaise functions algorithm header mein hain.</div>
+  </section>
+
+  <!-- 4 BASIC OPS -->
+  <section id="basic-ops">
+    <h2 class="section-title">4️⃣ Traversal, Comparison &amp; Concatenation</h2>
+
+    <h3>Traversal</h3>
+    <pre><code>for (int i = 0; i < s.length(); i++) cout << s[i];
+for (char c : s) cout << c;   // range-based (cleaner)</code></pre>
+
+    <h3>Comparison</h3>
+    <pre><code>string a = "apple", b = "banana";
+if (a == b) { /* equal */ }
+if (a < b) { /* lexicographically pehle -- operator overload hai */ }
+a.compare(b);   // 0 agar equal, negative agar a<b, positive agar a>b</code></pre>
+
+    <h3>Concatenation</h3>
+    <pre><code>string a = "hello", b = "world";
+string c = a + " " + b;   // "hello world"
+a += "!";                  // in-place append</code></pre>
+
+    <div class="callout warn"><b>Dhyan dein:</b> Loop ke andar baar-baar <code>result += s[i]</code> karna theek hai (amortized O(1) per append), lekin repeated <code>result = result + s[i]</code> (naya string banate rehna) O(n²) ho sakta hai bade strings mein.</div>
+  </section>
+
+  <!-- 5 ASCII -->
+  <section id="ascii">
+    <h2 class="section-title">5️⃣ Character &amp; ASCII Manipulation</h2>
+    <pre><code>char c = 'a';
+int ascii = (int)c;          // 97
+
+// lowercase to uppercase
+char upper = toupper(c);     // 'A'
+char lower = tolower('B');    // 'b'
+
+// digit check
+isdigit('5');    // true
+isalpha('a');     // true
+isalnum('9');     // true (alphanumeric)
+
+// character to digit
+char d = '7';
+int num = d - '0';    // 7  (ASCII trick)
+
+// frequency array (26 lowercase letters ke liye)
+int freq[26] = {0};
+freq[c - 'a']++;   // 'a' ka index 0, 'b' ka 1, ... </code></pre>
+    <div class="callout interview"><b>Interview Point:</b> <code>char - '0'</code> aur <code>char - 'a'</code> ye 2 tricks bohot bar-bar use hoti hain — digit ko number mein convert karna, aur letter ko 0-25 index mein map karna (frequency array ke liye).</div>
+  </section>
+
+  <!-- 6 COMPLEXITY -->
+  <section id="complexity">
+    <h2 class="section-title">6️⃣ Complexity Cheat Sheet</h2>
+    <table>
+      <tr><th>Operation</th><th>Time Complexity</th></tr>
+      <tr><td>Access by index</td><td>O(1)</td></tr>
+      <tr><td>Traversal</td><td>O(n)</td></tr>
+      <tr><td><code>substr(pos, len)</code></td><td>O(len) — naya string banta hai</td></tr>
+      <tr><td><code>find()</code></td><td>O(n*m) worst case (naive)</td></tr>
+      <tr><td>Concatenation (<code>+=</code>)</td><td>Amortized O(1) per char</td></tr>
+      <tr><td><code>reverse()</code> / <code>sort()</code></td><td>O(n) / O(n log n)</td></tr>
+      <tr><td>Comparison (<code>==</code>, <code>&lt;</code>)</td><td>O(n)</td></tr>
+    </table>
+  </section>
+
+  <!-- ============ PART B: PATTERNS ============ -->
+  <div class="part-banner">
+    <h2>🎯 Part B — Standard Patterns for LeetCode</h2>
+    <p>Ab jab basics clear hain, ye 8 reusable patterns 90% String questions solve kar dete hain.</p>
+  </div>
+
+  <!-- CHEATSHEET -->
+  <section id="cheatsheet">
+    <h2 class="section-title">🎯 Pattern Recognition Cheat Sheet</h2>
+    <table>
+      <tr><th>Question mein ye dikhe...</th><th>Pattern</th></tr>
+      <tr><td>"palindrome check", "reverse", "two strings compare from ends"</td><td>#1 Two Pointers</td></tr>
+      <tr><td>"longest substring", "minimum window substring", "anagram substring"</td><td>#2 Sliding Window</td></tr>
+      <tr><td>"anagram", "frequency", "first unique character"</td><td>#3 Hashing/Frequency Count</td></tr>
+      <tr><td>"group anagrams", "sort characters"</td><td>#4 Sorting-based</td></tr>
+      <tr><td>"valid parentheses", "decode string", "remove adjacent duplicates"</td><td>#5 Stack-based</td></tr>
+      <tr><td>"longest common subsequence", "edit distance", "longest palindromic substring"</td><td>#6 Dynamic Programming</td></tr>
+      <tr><td>"generate all permutations/subsets", "letter combinations"</td><td>#7 Backtracking</td></tr>
+      <tr><td>"find pattern occurrence efficiently", "substring search"</td><td>#8 String Matching (KMP)</td></tr>
+    </table>
+  </section>
+
+  <!-- PATTERN 1: TWO POINTERS -->
+  <section id="p1">
+    <h2 class="section-title">Pattern 1 — Two Pointers</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "palindrome check", "reverse string", string ke dono ends se ek saath compare/move karna ho.</div>
+
+      <h3>Template</h3>
+      <pre><code>int left = 0, right = s.length() - 1;
+while (left < right) {
+    // check / swap karo
+    left++; right--;
+}</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Valid Palindrome</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>bool isPalindrome(string s) {
+    int left = 0, right = s.size() - 1;
+    while (left < right) {
+        if (!isalnum(s[left])) { left++; continue; }
+        if (!isalnum(s[right])) { right--; continue; }
+        if (tolower(s[left]) != tolower(s[right])) return false;
+        left++; right--;
+    }
+    return true;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Reverse String (in-place)</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>void reverseString(vector&lt;char&gt;&amp; s) {
+    int left = 0, right = s.size() - 1;
+    while (left < right) {
+        swap(s[left], s[right]);
+        left++; right--;
+    }
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Valid Palindrome II</span> (ek character remove karke)</span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Mismatch milte hi 2 possibilities try karo — left skip karke ya right skip karke.</p>
+<pre><code>bool isPalin(string&amp; s, int left, int right) {
+    while (left < right) {
+        if (s[left] != s[right]) return false;
+        left++; right--;
+    }
+    return true;
+}
+
+bool validPalindrome(string s) {
+    int left = 0, right = s.size() - 1;
+    while (left < right) {
+        if (s[left] != s[right]) {
+            return isPalin(s, left + 1, right) || isPalin(s, left, right - 1);
+        }
+        left++; right--;
+    }
+    return true;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> String ke Two Pointers Array wale se same hi hain — sirf data type <code>char</code> hai. Concept transfer directly hota hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 2: SLIDING WINDOW -->
+  <section id="p2">
+    <h2 class="section-title">Pattern 2 — Sliding Window</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "longest/shortest substring with condition", "minimum window containing all characters", "anagram in string" — jab ek contiguous window ko slide karna ho.</div>
+
+      <h3>Template</h3>
+      <pre><code>unordered_map&lt;char, int&gt; window;
+int left = 0;
+for (int right = 0; right < s.size(); right++) {
+    window[s[right]]++;    // window mein s[right] add karo
+
+    while (/* window invalid */) {
+        window[s[left]]--;  // window se s[left] remove karo
+        left++;
+    }
+    // yahan window valid hai — answer update karo
+}</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Longest Substring Without Repeating Characters</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>int lengthOfLongestSubstring(string s) {
+    unordered_map&lt;char, int&gt; lastSeen;
+    int left = 0, maxLen = 0;
+
+    for (int right = 0; right < s.size(); right++) {
+        if (lastSeen.count(s[right]) && lastSeen[s[right]] >= left) {
+            left = lastSeen[s[right]] + 1;
+        }
+        lastSeen[s[right]] = right;
+        maxLen = max(maxLen, right - left + 1);
+    }
+    return maxLen;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Find All Anagrams in a String</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Fixed-size window (size = p.length()) — frequency array se compare karo.</p>
+<pre><code>vector&lt;int&gt; findAnagrams(string s, string p) {
+    vector&lt;int&gt; result;
+    if (s.size() < p.size()) return result;
+
+    vector&lt;int&gt; pCount(26, 0), sCount(26, 0);
+    for (char c : p) pCount[c - 'a']++;
+
+    for (int i = 0; i < s.size(); i++) {
+        sCount[s[i] - 'a']++;
+        if (i >= p.size()) sCount[s[i - p.size()] - 'a']--;
+        if (i >= p.size() - 1 && sCount == pCount) result.push_back(i - p.size() + 1);
+    }
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🔴 <span class="lc-title">Minimum Window Substring</span></span><span class="badge hard">Hard</span></summary>
+        <div class="details-body">
+          <p>Variable-size window — pehle expand karo jab tak sab characters cover na ho jayein, phir shrink karo minimum window dhundne ke liye.</p>
+<pre><code>string minWindow(string s, string t) {
+    unordered_map&lt;char, int&gt; need;
+    for (char c : t) need[c]++;
+
+    unordered_map&lt;char, int&gt; window;
+    int left = 0, required = need.size(), formed = 0;
+    int bestLen = INT_MAX, bestStart = 0;
+
+    for (int right = 0; right < s.size(); right++) {
+        char c = s[right];
+        window[c]++;
+        if (need.count(c) && window[c] == need[c]) formed++;
+
+        while (formed == required) {
+            if (right - left + 1 < bestLen) {
+                bestLen = right - left + 1;
+                bestStart = left;
+            }
+            char lc = s[left];
+            window[lc]--;
+            if (need.count(lc) && window[lc] < need[lc]) formed--;
+            left++;
+        }
+    }
+    return bestLen == INT_MAX ? "" : s.substr(bestStart, bestLen);
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> Sliding Window String problems mein aksar <b>frequency map</b> (array ya hashmap) ke saath combine hota hai — window ke andar characters ka count track karna padta hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 3: HASHING -->
+  <section id="p3">
+    <h2 class="section-title">Pattern 3 — Hashing / Frequency Count</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "anagram check", "first unique character", "character frequency" — jahan characters ka count track karna ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Valid Anagram</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>bool isAnagram(string s, string t) {
+    if (s.size() != t.size()) return false;
+    vector&lt;int&gt; count(26, 0);
+    for (char c : s) count[c - 'a']++;
+    for (char c : t) count[c - 'a']--;
+    for (int x : count) if (x != 0) return false;
+    return true;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">First Unique Character in a String</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>int firstUniqChar(string s) {
+    vector&lt;int&gt; count(26, 0);
+    for (char c : s) count[c - 'a']++;
+    for (int i = 0; i < s.size(); i++)
+        if (count[s[i] - 'a'] == 1) return i;
+    return -1;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Longest Palindrome (build from chars)</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+          <p>Har character jiska count even hai use pura use kar sakte ho; odd wale mein se 1 extra character center mein use ho sakta hai.</p>
+<pre><code>int longestPalindrome(string s) {
+    unordered_map&lt;char, int&gt; count;
+    for (char c : s) count[c]++;
+
+    int length = 0;
+    bool hasOdd = false;
+    for (auto&amp; [ch, cnt] : count) {
+        length += (cnt / 2) * 2;
+        if (cnt % 2 == 1) hasOdd = true;
+    }
+    return hasOdd ? length + 1 : length;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Sirf lowercase letters hon to <code>vector&lt;int&gt;(26, 0)</code> array HashMap se fast hota hai (fixed size, no hashing overhead) — jab bhi range pata ho, array prefer karo.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 4: SORTING -->
+  <section id="p4">
+    <h2 class="section-title">Pattern 4 — Sorting-based</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "group anagrams", "check if one string is permutation of another" — jahan characters/strings ko sort karke compare karna simplify kare.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Group Anagrams</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Har string ko sort karo — sorted version hi HashMap ki "key" ban jaati hai, sab anagrams same key share karenge.</p>
+<pre><code>vector&lt;vector&lt;string&gt;&gt; groupAnagrams(vector&lt;string&gt;&amp; strs) {
+    unordered_map&lt;string, vector&lt;string&gt;&gt; groups;
+    for (string&amp; s : strs) {
+        string key = s;
+        sort(key.begin(), key.end());
+        groups[key].push_back(s);
+    }
+
+    vector&lt;vector&lt;string&gt;&gt; result;
+    for (auto&amp; [key, group] : groups) result.push_back(group);
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Sort Characters By Frequency</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>string frequencySort(string s) {
+    unordered_map&lt;char, int&gt; freq;
+    for (char c : s) freq[c]++;
+
+    vector&lt;pair&lt;char,int&gt;&gt; chars(freq.begin(), freq.end());
+    sort(chars.begin(), chars.end(), [](auto&amp; a, auto&amp; b) {
+        return a.second > b.second;
+    });
+
+    string result;
+    for (auto&amp; [ch, count] : chars)
+        result += string(count, ch);
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> "Sort as key" trick (jaise Group Anagrams mein) bohot common hai — do strings same "signature" share karte hain to unhe group karne ka ek elegant tareeka hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 5: STACK -->
+  <section id="p5">
+    <h2 class="section-title">Pattern 5 — Stack-based</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "valid parentheses", "decode string", "remove adjacent duplicates" — jahan nested/matching structure ho ya "undo last action" jaisa behavior chahiye ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Valid Parentheses</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>bool isValid(string s) {
+    stack&lt;char&gt; st;
+    unordered_map&lt;char, char&gt; pairs = {{')','('}, {']','['}, {'}','{'}};
+
+    for (char c : s) {
+        if (c == '(' || c == '[' || c == '{') {
+            st.push(c);
+        } else {
+            if (st.empty() || st.top() != pairs[c]) return false;
+            st.pop();
+        }
+    }
+    return st.empty();
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Remove All Adjacent Duplicates in String</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>string removeDuplicates(string s) {
+    string st;   // string ko hi stack ki tarah use kar rahe hain
+    for (char c : s) {
+        if (!st.empty() && st.back() == c) {
+            st.pop_back();
+        } else {
+            st.push_back(c);
+        }
+    }
+    return st;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Decode String</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>2 stacks use karo — ek numbers ke liye, ek strings ke liye. <code>[</code> pe push karo, <code>]</code> pe pop karke decode karo.</p>
+<pre><code>string decodeString(string s) {
+    stack&lt;int&gt; counts;
+    stack&lt;string&gt; strs;
+    string current = "";
+    int num = 0;
+
+    for (char c : s) {
+        if (isdigit(c)) {
+            num = num * 10 + (c - '0');
+        } else if (c == '[') {
+            counts.push(num);
+            strs.push(current);
+            num = 0;
+            current = "";
+        } else if (c == ']') {
+            int repeatTimes = counts.top(); counts.pop();
+            string prev = strs.top(); strs.pop();
+            string temp = current;
+            for (int i = 0; i < repeatTimes; i++) prev += temp;
+            current = prev;
+        } else {
+            current += c;
+        }
+    }
+    return current;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Jab bhi "matching pairs" ya "nested structure undo karna" jaisa lage, Stack pehla option socho — LIFO order isi tarah ke problems ke liye perfect fit hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 6: DP -->
+  <section id="p6">
+    <h2 class="section-title">Pattern 6 — Dynamic Programming on Strings</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "longest common subsequence", "edit distance", "longest palindromic substring" — jahan 2D table se overlapping subproblems solve hote hain.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Longest Palindromic Substring</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>"Expand around center" approach — har index (aur har gap) ko center maan ke dono taraf expand karo.</p>
+<pre><code>string longestPalindrome(string s) {
+    if (s.empty()) return "";
+    int start = 0, maxLen = 1;
+
+    auto expandFromCenter = [&](int left, int right) {
+        while (left >= 0 && right < s.size() && s[left] == s[right]) {
+            left--; right++;
+        }
+        int len = right - left - 1;
+        if (len > maxLen) {
+            maxLen = len;
+            start = left + 1;
+        }
+    };
+
+    for (int i = 0; i < s.size(); i++) {
+        expandFromCenter(i, i);       // odd length palindrome
+        expandFromCenter(i, i + 1);   // even length palindrome
+    }
+    return s.substr(start, maxLen);
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Longest Common Subsequence</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>int longestCommonSubsequence(string text1, string text2) {
+    int m = text1.size(), n = text2.size();
+    vector&lt;vector&lt;int&gt;&gt; dp(m + 1, vector&lt;int&gt;(n + 1, 0));
+
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (text1[i-1] == text2[j-1]) dp[i][j] = dp[i-1][j-1] + 1;
+            else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+    return dp[m][n];
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🔴 <span class="lc-title">Edit Distance</span></span><span class="badge hard">Hard</span></summary>
+        <div class="details-body">
+<pre><code>int minDistance(string word1, string word2) {
+    int m = word1.size(), n = word2.size();
+    vector&lt;vector&lt;int&gt;&gt; dp(m + 1, vector&lt;int&gt;(n + 1, 0));
+
+    for (int i = 0; i <= m; i++) dp[i][0] = i;
+    for (int j = 0; j <= n; j++) dp[0][j] = j;
+
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (word1[i-1] == word2[j-1]) dp[i][j] = dp[i-1][j-1];
+            else dp[i][j] = 1 + min({dp[i-1][j-1], dp[i-1][j], dp[i][j-1]});
+        }
+    }
+    return dp[m][n];
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> String DP problems mein <b>2D table</b> banao jahan <code>dp[i][j]</code> = "pehli string ke first i characters aur dusri ke first j characters" ka answer represent kare — ye base setup 80% string-DP problems mein reuse hota hai.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 7: BACKTRACKING -->
+  <section id="p7">
+    <h2 class="section-title">Pattern 7 — Backtracking on Strings</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "generate all permutations", "letter combinations", "all valid combinations" — jahan saare possible outcomes explore karne hon.</div>
+
+      <h3>Template</h3>
+      <pre><code>void backtrack(string&amp; current, /* other params */) {
+    if (/* base case complete */) {
+        result.push_back(current);
+        return;
+    }
+    for (/* har choice */) {
+        current.push_back(choice);      // choose karo
+        backtrack(current, ...);         // explore karo
+        current.pop_back();              // un-choose karo (backtrack)
+    }
+}</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Letter Combinations of a Phone Number</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;string&gt; letterCombinations(string digits) {
+    if (digits.empty()) return {};
+    vector&lt;string&gt; mapping = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+    vector&lt;string&gt; result;
+    string current;
+
+    function&lt;void(int)&gt; backtrack = [&](int index) {
+        if (index == digits.size()) {
+            result.push_back(current);
+            return;
+        }
+        string letters = mapping[digits[index] - '0'];
+        for (char c : letters) {
+            current.push_back(c);
+            backtrack(index + 1);
+            current.pop_back();
+        }
+    };
+
+    backtrack(0);
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Generate Parentheses</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;string&gt; generateParenthesis(int n) {
+    vector&lt;string&gt; result;
+    string current;
+
+    function&lt;void(int,int)&gt; backtrack = [&](int open, int close) {
+        if (current.size() == 2 * n) {
+            result.push_back(current);
+            return;
+        }
+        if (open < n) {
+            current.push_back('(');
+            backtrack(open + 1, close);
+            current.pop_back();
+        }
+        if (close < open) {
+            current.push_back(')');
+            backtrack(open, close + 1);
+            current.pop_back();
+        }
+    };
+
+    backtrack(0, 0);
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout warn"><b>Dhyan dein:</b> Backtracking mein har "choose" ke baad matching "un-choose" (<code>pop_back()</code>) zaroor karo, warna string ki state agle branch ke liye corrupt ho jaayegi.</div>
+    </div>
+  </section>
+
+  <!-- PATTERN 8: KMP -->
+  <section id="p8">
+    <h2 class="section-title">Pattern 8 — String Matching (KMP Algorithm)</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "find all occurrences of pattern in text efficiently", jab naive O(n*m) substring search bohot slow ho.</div>
+
+      <p>KMP (Knuth-Morris-Pratt) ek <b>LPS array</b> (Longest Prefix which is also Suffix) banata hai jisse pattern match fail hone par bhi text mein wapas jaane ki zaroorat nahi padti — O(n+m) mein solve ho jaata hai.</p>
+
+      <details>
+        <summary><span class="sum-left">🔴 <span class="lc-title">Implement strStr()</span> using KMP</span><span class="badge hard">Hard</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;int&gt; computeLPS(string&amp; pattern) {
+    int n = pattern.size();
+    vector&lt;int&gt; lps(n, 0);
+    int len = 0, i = 1;
+
+    while (i < n) {
+        if (pattern[i] == pattern[len]) {
+            lps[i++] = ++len;
+        } else if (len > 0) {
+            len = lps[len - 1];
+        } else {
+            lps[i++] = 0;
+        }
+    }
+    return lps;
+}
+
+int strStr(string haystack, string needle) {
+    if (needle.empty()) return 0;
+    vector&lt;int&gt; lps = computeLPS(needle);
+    int i = 0, j = 0;
+
+    while (i < haystack.size()) {
+        if (haystack[i] == needle[j]) {
+            i++; j++;
+            if (j == needle.size()) return i - j;   // match mil gaya
+        } else if (j > 0) {
+            j = lps[j - 1];
+        } else {
+            i++;
+        }
+    }
+    return -1;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Interview mein KMP poori tarah likhna rare hota hai, lekin concept samajhna (LPS array kya karta hai aur kyun O(n+m) milta hai) important hai — aksar "explain your approach" pucha jaata hai.</div>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section id="mistakes">
+    <h2 class="section-title">⚠️ Common Mistakes &amp; Interview Tips</h2>
+    <ul>
+      <li>String comparison mein <code>==</code> use karna bhool jaana (ya galat expect karna ki pointer compare hoga jaise C mein)</li>
+      <li>Repeated string concatenation loop mein karna — O(n²) ho sakta hai; StringBuilder jaisi soch C++ mein <code>+=</code> se hi milti hai</li>
+      <li><code>s[i] - '0'</code> ya <code>s[i] - 'a'</code> bhool jaana character-to-number conversions mein</li>
+      <li>Backtracking mein <code>pop_back()</code> (un-choose) karna bhool jaana</li>
+      <li>Sliding Window mein window ki validity check karna bhool jaana pehle shrink karne se pehle</li>
+      <li>Empty string ya single character edge cases handle na karna</li>
+    </ul>
+    <div class="callout warn"><b>Dhyan dein:</b> String problems mein hamesha socho — "characters ka range kya hai?" (lowercase only? unicode?) — isse frequency array vs HashMap ka decision easy ho jaata hai.</div>
+  </section>
+
+  <!-- QA -->
+  <section id="qa">
+    <h2 class="section-title">🧠 Quick Revision — Click to Reveal</h2>
+
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">C++ string mutable hai to Java/Python se kya farak padta hai?</div>
+      <div class="a">C++ mein tum in-place modify kar sakte ho (reverse, swap) bina extra space liye. Java/Python mein string immutable hai, isliye har modification naya string banata hai (extra space/time).</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Anagram check karne ka fastest tareeka kya hai?</div>
+      <div class="a">Sorting se O(n log n) lagta hai. Frequency array (26 size) se O(n) mein ho jaata hai — dono strings ka character count match karke.</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">"Expand around center" approach kaam kaise karta hai palindrome ke liye?</div>
+      <div class="a">Har possible center (n centers for odd length, n-1 gaps for even length) se dono taraf expand karte hain jab tak characters match karein — total O(n²) time, but O(1) space (DP se better space-wise).</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Kab Stack use karna chahiye string problems mein?</div>
+      <div class="a">Jab "matching pairs", "nested structure", ya "most recent unmatched item chahiye" jaisa pattern ho — jaise valid parentheses, decode string, ya removing adjacent duplicates.</div>
+    </div>
+  </section>
+
+  <!-- MASTER LIST -->
+  <section id="master-list">
+    <h2 class="section-title">📋 Master Practice List (Pattern-wise)</h2>
+    <table>
+      <tr><th>#</th><th>Problem</th><th>Pattern</th><th>Level</th></tr>
+      <tr><td>1</td><td>Valid Anagram</td><td>#3 Hashing</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>2</td><td>Valid Palindrome</td><td>#1 Two Pointers</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>3</td><td>Reverse String</td><td>#1 Two Pointers</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>4</td><td>First Unique Character in a String</td><td>#3 Hashing</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>5</td><td>Valid Parentheses</td><td>#5 Stack-based</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>6</td><td>Remove All Adjacent Duplicates</td><td>#5 Stack-based</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>7</td><td>Implement strStr()</td><td>#8 KMP (or naive)</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>8</td><td>Longest Common Prefix</td><td>#1 Two Pointers / Sorting</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>9</td><td>Valid Palindrome II</td><td>#1 Two Pointers</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>10</td><td>Longest Palindrome (build)</td><td>#3 Hashing</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>11</td><td>Longest Substring Without Repeating Chars</td><td>#2 Sliding Window</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>12</td><td>Find All Anagrams in a String</td><td>#2 Sliding Window</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>13</td><td>Group Anagrams</td><td>#4 Sorting-based</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>14</td><td>Sort Characters By Frequency</td><td>#4 Sorting-based</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>15</td><td>Decode String</td><td>#5 Stack-based</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>16</td><td>Longest Palindromic Substring</td><td>#6 DP (Expand Center)</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>17</td><td>Longest Common Subsequence</td><td>#6 DP</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>18</td><td>Letter Combinations of a Phone Number</td><td>#7 Backtracking</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>19</td><td>Generate Parentheses</td><td>#7 Backtracking</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>20</td><td>String to Integer (atoi)</td><td>Edge-case handling</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>21</td><td>Palindromic Substrings (count)</td><td>#6 DP (Expand Center)</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>22</td><td>Zigzag Conversion</td><td>Simulation</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>23</td><td>Word Break</td><td>#6 DP</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>24</td><td>Permutation in String</td><td>#2 Sliding Window</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>25</td><td>Edit Distance</td><td>#6 DP</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>26</td><td>Minimum Window Substring</td><td>#2 Sliding Window</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>27</td><td>Regular Expression Matching</td><td>#6 DP</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>28</td><td>Shortest Palindrome</td><td>#8 KMP</td><td><span class="badge hard">Hard</span></td></tr>
+    </table>
+    <div class="callout tip"><b>Tip:</b> In 28 problems ko 2 baar solve karo — pattern muscle-memory ban jaayega aur naye unseen questions bhi crack ho jaayenge.</div>
+  </section>
+
+  <!-- TRACKER -->
+  <section id="tracker">
+    <h2 class="section-title">📊 Progress Tracker</h2>
+    <div class="progress-wrap">
+      <p style="margin:0; color:#fff; font-weight:600;">Progress: <span id="progress-text">0 / 11</span></p>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+      <div style="margin-top:14px;">
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Theory — Mutable string, built-in functions</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Theory — ASCII/character manipulation</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 1 — Two Pointers</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 2 — Sliding Window</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 3 — Hashing/Frequency Count</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 4 — Sorting-based</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 5 — Stack-based</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 6 — Dynamic Programming</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 7 — Backtracking</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Pattern 8 — String Matching (KMP concept)</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Kam se kam 18 LeetCode problems solve kiye</div>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">✨ Theory se Pattern tak — ab practice shuru karo. Consistency is the key! ✨</p>
+</div>
+
+<script>
+function updateProgress(){
+  const boxes = document.querySelectorAll('.check-item input');
+  let checked = 0;
+  boxes.forEach(b => { if(b.checked) checked++; });
+  document.getElementById('progress-text').innerText = checked + ' / ' + boxes.length;
+  document.getElementById('progress-fill').style.width = (checked/boxes.length*100) + '%';
+}
+</script>
+
+</body>
+</html>

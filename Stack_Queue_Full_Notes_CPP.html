@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack &amp; Queue — Basics + Patterns (C++) — Complete Notes</title>
+<style>
+  :root{
+    --bg:#0b0f19; --panel:#121826; --panel2:#161f30; --border:#232d42;
+    --accent:#8b5cf6; --accent2:#22d3ee; --accent3:#f472b6;
+    --green:#34d399; --orange:#fbbf24; --red:#f87171;
+    --text:#e2e8f0; --muted:#94a3b8;
+  }
+  *{box-sizing:border-box; scroll-behavior:smooth;}
+  body{ margin:0; background:var(--bg); color:var(--text);
+    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; display:flex; min-height:100vh; }
+
+  #sidebar{ width:260px; min-width:260px; background:var(--panel);
+    border-right:1px solid var(--border); padding:18px 12px;
+    position:sticky; top:0; height:100vh; overflow-y:auto; }
+  #sidebar h2{ font-size:14px; color:var(--accent2); margin:4px 6px 14px; letter-spacing:0.5px;}
+  #sidebar a{ display:block; color:var(--muted); text-decoration:none; font-size:12.5px;
+    padding:7px 10px; border-radius:8px; margin-bottom:2px; transition:0.15s; border-left:3px solid transparent;}
+  #sidebar a:hover{ background:var(--panel2); color:var(--text); border-left:3px solid var(--accent);}
+  #sidebar .grp{ color:#5b6478; font-size:10.5px; text-transform:uppercase; letter-spacing:1px; margin:14px 8px 4px;}
+  #sidebar .pnum{ display:inline-block; background:var(--accent); color:#fff; font-size:9.5px; font-weight:700;
+    width:16px; height:16px; border-radius:4px; text-align:center; line-height:16px; margin-right:6px;}
+  #sidebar .topic-divider{ border-top:2px solid var(--accent); margin:18px 4px 6px; }
+
+  #main{ flex:1; padding:30px 40px; max-width:1000px; }
+  .hero{ background:linear-gradient(135deg,#1e1b4b,#312e81 40%,#4c1d95); border-radius:18px;
+    padding:38px 34px; margin-bottom:26px; border:1px solid var(--border); box-shadow:0 0 60px rgba(139,92,246,0.15);}
+  .hero h1{ font-size:27px; margin:0 0 8px; background:linear-gradient(90deg,#c4b5fd,#67e8f9);
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero p{ color:var(--muted); font-size:13.5px; margin:4px 0; }
+  .chip{ display:inline-block; background:rgba(139,92,246,0.15); color:#c4b5fd; border:1px solid rgba(139,92,246,0.4);
+    padding:5px 12px; border-radius:20px; font-size:11px; margin:8px 4px 0 0;}
+
+  .part-banner{ background:linear-gradient(90deg, rgba(139,92,246,0.18), rgba(34,211,238,0.08));
+    border:1px solid var(--accent); border-radius:12px; padding:16px 20px; margin:30px 0 10px;}
+  .part-banner h2{ margin:0; color:#fff; font-size:20px; }
+  .part-banner p{ margin:6px 0 0; color:var(--muted); font-size:12.5px; }
+
+  .topic-banner{ background:linear-gradient(90deg, rgba(244,114,182,0.18), rgba(139,92,246,0.1));
+    border:1px solid var(--accent3); border-radius:14px; padding:20px 24px; margin:36px 0 14px;}
+  .topic-banner h1{ margin:0; color:#fff; font-size:24px; }
+  .topic-banner p{ margin:6px 0 0; color:var(--muted); font-size:13px; }
+
+  section{ margin-bottom:14px; scroll-margin-top:20px; }
+  h2.section-title{ font-size:18px; color:#fff; background:var(--panel2); padding:12px 16px; border-radius:10px;
+    border-left:4px solid var(--accent); margin:26px 0 12px; display:flex; align-items:center; gap:8px;}
+  h3{ color:var(--accent2); font-size:14.5px; margin-top:18px;}
+  p{ line-height:1.65; font-size:13.5px; color:#cbd5e1; }
+  ul,ol{ font-size:13.5px; color:#cbd5e1; line-height:1.7; }
+  b{ color:#fff; }
+
+  .pattern-card{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:14px 0;}
+  .signal{ background:rgba(34,211,238,0.08); border:1px dashed rgba(34,211,238,0.4); border-radius:8px;
+    padding:8px 12px; font-size:12.5px; color:#a5f3fc; margin:10px 0;}
+  .signal b{ color:var(--accent2); }
+
+  details{ background:var(--panel2); border:1px solid var(--border); border-radius:10px; margin:10px 0; overflow:hidden;}
+  details[open]{ border-color:var(--accent); }
+  summary{ cursor:pointer; padding:11px 16px; font-weight:600; font-size:13px; color:var(--text); list-style:none;
+    display:flex; align-items:center; justify-content:space-between; background:#1a2338;}
+  summary::-webkit-details-marker{ display:none; }
+  summary::after{ content:"+"; color:var(--accent2); font-size:18px; font-weight:400; }
+  details[open] summary::after{ content:"–"; }
+  .details-body{ padding:14px 18px; }
+  .sum-left{ display:flex; align-items:center; gap:8px; }
+
+  .callout{ border-radius:10px; padding:11px 15px; margin:10px 0; font-size:12.5px; line-height:1.6; }
+  .tip{ background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.35); }
+  .tip b{ color:var(--green); }
+  .warn{ background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.35); }
+  .warn b{ color:var(--orange); }
+  .interview{ background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.35); }
+  .interview b{ color:var(--red); }
+  .analogy{ background:rgba(34,211,238,0.08); border:1px solid rgba(34,211,238,0.35); }
+  .analogy b{ color:var(--accent2); }
+
+  .diagram{ background:#05070d; border:1px solid var(--border); border-radius:10px; padding:14px;
+    font-family:'Consolas',monospace; font-size:12px; color:#67e8f9; text-align:center; white-space:pre;
+    overflow-x:auto; margin:10px 0;}
+
+  pre{ margin:0; padding:14px 16px; background:#0a0e17; color:#d4d4f4; font-size:12px; overflow-x:auto;
+    line-height:1.55; border-radius:8px; border:1px solid var(--border); }
+  code{ font-family:'Consolas','Courier New',monospace; }
+  p code, li code{ background:rgba(139,92,246,0.15); color:#c4b5fd; padding:1px 6px; border-radius:4px; font-size:12px;}
+
+  table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:12.5px; }
+  th{ background:var(--accent); color:#fff; padding:8px 10px; text-align:left; }
+  td{ padding:7px 10px; border-bottom:1px solid var(--border); color:#cbd5e1; }
+  tr:nth-child(even) td{ background:var(--panel); }
+
+  .badge{ padding:2px 9px; border-radius:12px; font-size:10px; font-weight:700; }
+  .easy{ background:rgba(52,211,153,0.15); color:var(--green); border:1px solid rgba(52,211,153,0.4); }
+  .medium{ background:rgba(251,191,36,0.15); color:var(--orange); border:1px solid rgba(251,191,36,0.4); }
+  .hard{ background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.4); }
+
+  .lc-title{ font-weight:700; color:#fff; }
+
+  .progress-wrap{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 18px; margin:14px 0;}
+  .progress-bar-bg{ background:#1e293b; border-radius:20px; height:10px; overflow:hidden; margin-top:8px;}
+  .progress-bar-fill{ background:linear-gradient(90deg,var(--accent),var(--accent2)); height:100%; width:0%; transition:width .3s;}
+  .check-item{ display:flex; align-items:center; gap:10px; padding:6px 0; font-size:13px; color:#cbd5e1;}
+  .check-item input{ width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+
+  .qa{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin:8px 0; cursor:pointer;}
+  .qa .q{ color:var(--accent2); font-weight:700; font-size:13px; }
+  .qa .a{ margin-top:6px; font-size:12.5px; color:#cbd5e1; display:none; }
+  .qa.open .a{ display:block; }
+  .qa .q::before{ content:"❯ "; color:var(--accent); }
+
+  .foot{ text-align:center; color:#5b6478; font-size:12px; margin:40px 0 10px; }
+
+  ::-webkit-scrollbar{ width:9px; height:9px; }
+  ::-webkit-scrollbar-thumb{ background:#2d3648; border-radius:10px; }
+  ::-webkit-scrollbar-track{ background:var(--bg); }
+
+  @media (max-width:800px){ body{ flex-direction:column; } #sidebar{ width:100%; height:auto; position:relative;} #main{ padding:20px; } }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h2>📚 Stack &amp; Queue (C++)</h2>
+
+  <div class="grp">🟣 Stack — Theory</div>
+  <a href="#s-intro">1. Kya hota hai? (LIFO)</a>
+  <a href="#s-impl">2. Implementation</a>
+  <a href="#s-ops">3. Operations</a>
+  <a href="#s-apps">4. Applications</a>
+  <a href="#s-complexity">5. Complexity Sheet</a>
+
+  <div class="grp">🟣 Stack — Patterns</div>
+  <a href="#sp-cheatsheet">Pattern Recognition</a>
+  <a href="#sp1"><span class="pnum">1</span>Matching/Validity</a>
+  <a href="#sp2"><span class="pnum">2</span>Monotonic Stack</a>
+  <a href="#sp3"><span class="pnum">3</span>Expression Evaluation</a>
+  <a href="#sp4"><span class="pnum">4</span>Min/Max Stack Design</a>
+  <a href="#sp5"><span class="pnum">5</span>Stack for Simulation</a>
+
+  <div class="topic-divider"></div>
+
+  <div class="grp">🔵 Queue — Theory</div>
+  <a href="#q-intro">1. Kya hota hai? (FIFO)</a>
+  <a href="#q-impl">2. Implementation</a>
+  <a href="#q-ops">3. Operations</a>
+  <a href="#q-types">4. Types (Circular, Priority, Deque)</a>
+  <a href="#q-complexity">5. Complexity Sheet</a>
+
+  <div class="grp">🔵 Queue — Patterns</div>
+  <a href="#qp-cheatsheet">Pattern Recognition</a>
+  <a href="#qp1"><span class="pnum">1</span>BFS Traversal</a>
+  <a href="#qp2"><span class="pnum">2</span>Monotonic Deque</a>
+  <a href="#qp3"><span class="pnum">3</span>Two Stacks ↔ Queue</a>
+  <a href="#qp4"><span class="pnum">4</span>Priority Queue (Heap)</a>
+  <a href="#qp5"><span class="pnum">5</span>Circular Queue Design</a>
+
+  <div class="grp">Wrap Up</div>
+  <a href="#mistakes">Common Mistakes</a>
+  <a href="#qa">Quick Q&amp;A</a>
+  <a href="#master-list">Master Practice List</a>
+  <a href="#tracker">Progress Tracker</a>
+</div>
+
+<div id="main">
+
+  <div class="hero">
+    <h1>📚 Stack &amp; Queue — Basics + Patterns (C++)</h1>
+    <p>Ek hi jagah: pehle theory concepts clear karo, phir wahi concepts patterns ke roop mein LeetCode pe apply karo. Dono data structures ek saath — kyunki bohot saare problems inhe combine karte hain.</p>
+    <div>
+      <span class="chip">Pure C++</span>
+      <span class="chip">Theory se Practice tak</span>
+      <span class="chip">10 Patterns</span>
+      <span class="chip">28+ Solved Problems</span>
+    </div>
+  </div>
+
+  <!-- ================= STACK TOPIC ================= -->
+  <div class="topic-banner">
+    <h1>🟣 STACK</h1>
+    <p>LIFO (Last In, First Out) — jo aakhri mein aaya, wahi sabse pehle nikalta hai.</p>
+  </div>
+
+  <div class="part-banner">
+    <h2>📘 Part A — Stack Theory &amp; Concepts</h2>
+    <p>Pehle fundamentals clear karo — stack kaam kaise karta hai, C++ mein implement kaise karte hain.</p>
+  </div>
+
+  <!-- S1 INTRO -->
+  <section id="s-intro">
+    <h2 class="section-title">1️⃣ Stack kya hota hai? (LIFO)</h2>
+    <p><b>Stack</b> ek linear data structure hai jo <b>LIFO (Last In, First Out)</b> principle follow karta hai — jo element sabse aakhri mein insert hua, wahi sabse pehle remove hota hai. Insertion aur deletion dono sirf ek hi end — <b>"top"</b> — se hoti hai.</p>
+
+    <div class="diagram">   ┌─────────┐
+   │   30    │  ← TOP (sabse pehle nikalega)
+   ├─────────┤
+   │   20    │
+   ├─────────┤
+   │   10    │  ← Bottom (sabse pehle daala gaya)
+   └─────────┘</div>
+
+    <div class="callout analogy"><b>Samjho ise aise:</b> Plates ka stack socho — jo plate sabse upar (aakhri mein) rakhi, wahi sabse pehle uthaogi. Neeche wali plate tab tak nahi nikaal sakte jab tak upar wali saari na hata do.</div>
+
+    <div class="callout tip"><b>Tip:</b> Stack "recursion" ke bohot close hai — har function call bhi ek call stack mein push/pop hota hai. Isliye recursive solutions ko iterative banane ke liye aksar explicit Stack use hota hai.</div>
+  </section>
+
+  <!-- S2 IMPLEMENTATION -->
+  <section id="s-impl">
+    <h2 class="section-title">2️⃣ Implementation in C++</h2>
+    <h3>STL <code>stack</code> (sabse common — LeetCode mein yahi use karo)</h3>
+    <pre><code>#include &lt;stack&gt;
+using namespace std;
+
+stack&lt;int&gt; st;
+st.push(10);
+st.push(20);
+st.push(30);
+
+cout << st.top();   // 30
+st.pop();             // 30 remove ho jaata hai (return nahi karta!)
+cout << st.top();    // 20
+cout << st.empty();  // false
+cout << st.size();    // 2</code></pre>
+
+    <div class="callout warn"><b>Dhyan dein:</b> C++ ka <code>st.pop()</code> koi value <b>return nahi</b> karta — sirf remove karta hai. Value chahiye to pehle <code>st.top()</code> se le lo, phir <code>pop()</code> call karo.</div>
+
+    <h3>Array/Vector se manual implementation (samajhne ke liye)</h3>
+    <pre><code>class MyStack {
+    vector&lt;int&gt; data;
+public:
+    void push(int x) { data.push_back(x); }
+    void pop() { if (!data.empty()) data.pop_back(); }
+    int top() { return data.back(); }
+    bool empty() { return data.empty(); }
+};</code></pre>
+  </section>
+
+  <!-- S3 OPS -->
+  <section id="s-ops">
+    <h2 class="section-title">3️⃣ Core Operations &amp; Complexity</h2>
+    <table>
+      <tr><th>Operation</th><th>Kya karta hai</th><th>Time</th></tr>
+      <tr><td><code>push(x)</code></td><td>Top pe naya element daalo</td><td>O(1)</td></tr>
+      <tr><td><code>pop()</code></td><td>Top se element hatao</td><td>O(1)</td></tr>
+      <tr><td><code>top()</code></td><td>Top ka element dekho (bina hataye)</td><td>O(1)</td></tr>
+      <tr><td><code>empty()</code></td><td>Stack khaali hai kya check karo</td><td>O(1)</td></tr>
+    </table>
+    <div class="callout tip"><b>Tip:</b> Saari operations O(1) hain — yahi Stack ka sabse bada advantage hai jab bhi "most recent" cheez chahiye ho.</div>
+  </section>
+
+  <!-- S4 APPS -->
+  <section id="s-apps">
+    <h2 class="section-title">4️⃣ Real-World Applications</h2>
+    <ul>
+      <li><b>Function call stack:</b> Recursion internally isi se kaam karta hai</li>
+      <li><b>Undo/Redo:</b> Text editors, browsers (back button)</li>
+      <li><b>Expression evaluation:</b> Calculator, compiler (parentheses matching)</li>
+      <li><b>DFS (Depth First Search):</b> Explicit stack ya recursion se</li>
+      <li><b>Backtracking algorithms:</b> Maze solving, N-Queens</li>
+    </ul>
+  </section>
+
+  <!-- S5 COMPLEXITY -->
+  <section id="s-complexity">
+    <h2 class="section-title">5️⃣ Complexity Cheat Sheet</h2>
+    <table>
+      <tr><th>Operation</th><th>Time</th><th>Space</th></tr>
+      <tr><td>Push / Pop / Top / Empty</td><td>O(1)</td><td>O(1) per op</td></tr>
+      <tr><td>Search for element</td><td>O(n)</td><td>—</td></tr>
+      <tr><td>Overall space for n elements</td><td>—</td><td>O(n)</td></tr>
+    </table>
+  </section>
+
+  <div class="part-banner">
+    <h2>🎯 Part B — Standard Stack Patterns for LeetCode</h2>
+    <p>5 reusable patterns jo Stack-based LeetCode questions ka bulk cover karte hain.</p>
+  </div>
+
+  <!-- SP CHEATSHEET -->
+  <section id="sp-cheatsheet">
+    <h2 class="section-title">🎯 Pattern Recognition Cheat Sheet</h2>
+    <table>
+      <tr><th>Question mein ye dikhe...</th><th>Pattern</th></tr>
+      <tr><td>"valid parentheses", "matching brackets"</td><td>#1 Matching/Validity</td></tr>
+      <tr><td>"next greater element", "daily temperatures", "largest rectangle"</td><td>#2 Monotonic Stack</td></tr>
+      <tr><td>"evaluate expression", "calculator", "decode string"</td><td>#3 Expression Evaluation</td></tr>
+      <tr><td>"design a stack that also gives min/max in O(1)"</td><td>#4 Min/Max Stack Design</td></tr>
+      <tr><td>"simulate a process", "undo operation", "asteroid collision"</td><td>#5 Stack for Simulation</td></tr>
+    </table>
+  </section>
+
+  <!-- SP1: MATCHING -->
+  <section id="sp1">
+    <h2 class="section-title">Pattern 1 — Matching / Validity Check</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "valid parentheses", "matching brackets" — jahan opening symbol ko uske corresponding closing symbol se match karna ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Valid Parentheses</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>bool isValid(string s) {
+    stack&lt;char&gt; st;
+    unordered_map&lt;char, char&gt; pairs = {{')','('}, {']','['}, {'}','{'}};
+
+    for (char c : s) {
+        if (c == '(' || c == '[' || c == '{') {
+            st.push(c);
+        } else {
+            if (st.empty() || st.top() != pairs[c]) return false;
+            st.pop();
+        }
+    }
+    return st.empty();
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Minimum Add to Make Parentheses Valid</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>int minAddToMakeValid(string s) {
+    int open = 0, additions = 0;
+    for (char c : s) {
+        if (c == '(') open++;
+        else {
+            if (open > 0) open--;
+            else additions++;
+        }
+    }
+    return additions + open;
+}</code></pre>
+          <p>Yahan counter se bhi kaam ho jaata hai (stack ki zaroorat nahi) — lekin concept same hai: "kitne unmatched open bache hain".</p>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> Matching pattern ka core idea: <b>opening symbol push karo, closing symbol pe stack ka top check karo</b> — end mein stack empty honi chahiye.</div>
+    </div>
+  </section>
+
+  <!-- SP2: MONOTONIC -->
+  <section id="sp2">
+    <h2 class="section-title">Pattern 2 — Monotonic Stack</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "next greater/smaller element", "daily temperatures", "largest rectangle in histogram" — jahan har element ke liye "agla bada/chhota" element dhundna ho efficiently.</div>
+
+      <h3>Template (Next Greater Element)</h3>
+      <pre><code>stack&lt;int&gt; st;   // indices store karte hain
+vector&lt;int&gt; result(n, -1);
+
+for (int i = 0; i < n; i++) {
+    while (!st.empty() && arr[st.top()] < arr[i]) {
+        result[st.top()] = arr[i];   // ye current element hi "next greater" hai
+        st.pop();
+    }
+    st.push(i);
+}</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Next Greater Element I</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;int&gt; nextGreaterElement(vector&lt;int&gt;&amp; nums1, vector&lt;int&gt;&amp; nums2) {
+    unordered_map&lt;int, int&gt; nextGreater;
+    stack&lt;int&gt; st;
+
+    for (int num : nums2) {
+        while (!st.empty() && st.top() < num) {
+            nextGreater[st.top()] = num;
+            st.pop();
+        }
+        st.push(num);
+    }
+
+    vector&lt;int&gt; result;
+    for (int num : nums1) result.push_back(nextGreater.count(num) ? nextGreater[num] : -1);
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Daily Temperatures</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>"Kitne din baad garam din aayega" — indices ke saath monotonic decreasing stack maintain karo.</p>
+<pre><code>vector&lt;int&gt; dailyTemperatures(vector&lt;int&gt;&amp; temps) {
+    vector&lt;int&gt; result(temps.size(), 0);
+    stack&lt;int&gt; st;   // indices
+
+    for (int i = 0; i < temps.size(); i++) {
+        while (!st.empty() && temps[st.top()] < temps[i]) {
+            int idx = st.top(); st.pop();
+            result[idx] = i - idx;
+        }
+        st.push(i);
+    }
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🔴 <span class="lc-title">Largest Rectangle in Histogram</span></span><span class="badge hard">Hard</span></summary>
+        <div class="details-body">
+          <p>Monotonic increasing stack — jab chhota bar aaye, stack se pop karte hue area calculate karo.</p>
+<pre><code>int largestRectangleArea(vector&lt;int&gt;&amp; heights) {
+    stack&lt;int&gt; st;   // indices, increasing height order
+    int maxArea = 0;
+    heights.push_back(0);  // sentinel — end mein sab pop karwane ke liye
+
+    for (int i = 0; i < heights.size(); i++) {
+        while (!st.empty() && heights[st.top()] > heights[i]) {
+            int height = heights[st.top()]; st.pop();
+            int width = st.empty() ? i : i - st.top() - 1;
+            maxArea = max(maxArea, height * width);
+        }
+        st.push(i);
+    }
+    return maxArea;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> Monotonic Stack se O(n²) brute force (har element ke liye linear search) O(n) mein aa jaata hai — kyunki har element sirf ek baar push aur ek baar pop hota hai.</div>
+    </div>
+  </section>
+
+  <!-- SP3: EXPRESSION -->
+  <section id="sp3">
+    <h2 class="section-title">Pattern 3 — Expression Evaluation</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "evaluate expression", "basic calculator", "decode string" — jahan operators/nested structure ko sahi order mein process karna ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Evaluate Reverse Polish Notation</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>int evalRPN(vector&lt;string&gt;&amp; tokens) {
+    stack&lt;int&gt; st;
+    for (string&amp; token : tokens) {
+        if (token == "+" || token == "-" || token == "*" || token == "/") {
+            int b = st.top(); st.pop();
+            int a = st.top(); st.pop();
+            if (token == "+") st.push(a + b);
+            else if (token == "-") st.push(a - b);
+            else if (token == "*") st.push(a * b);
+            else st.push(a / b);
+        } else {
+            st.push(stoi(token));
+        }
+    }
+    return st.top();
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🔴 <span class="lc-title">Basic Calculator</span> (with +, -, parentheses)</span><span class="badge hard">Hard</span></summary>
+        <div class="details-body">
+<pre><code>int calculate(string s) {
+    stack&lt;int&gt; st;
+    int result = 0, num = 0, sign = 1;
+
+    for (char c : s) {
+        if (isdigit(c)) {
+            num = num * 10 + (c - '0');
+        } else if (c == '+') {
+            result += sign * num; num = 0; sign = 1;
+        } else if (c == '-') {
+            result += sign * num; num = 0; sign = -1;
+        } else if (c == '(') {
+            st.push(result); st.push(sign);
+            result = 0; sign = 1;
+        } else if (c == ')') {
+            result += sign * num; num = 0;
+            result *= st.top(); st.pop();     // pichla sign
+            result += st.top(); st.pop();     // pichla result
+        }
+    }
+    return result + sign * num;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Expression evaluation problems mein stack "state save karne" ke liye use hota hai — jab bracket khule to current state push karo, jab bracket band ho to pop karke combine karo.</div>
+    </div>
+  </section>
+
+  <!-- SP4: MIN MAX STACK -->
+  <section id="sp4">
+    <h2 class="section-title">Pattern 4 — Min/Max Stack Design</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "design a stack that supports getMin/getMax in O(1)" — normal stack ke saath extra info track karna ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Min Stack</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Do stacks use karo — ek normal values ke liye, ek "abhi tak ka minimum" track karne ke liye.</p>
+<pre><code>class MinStack {
+    stack&lt;int&gt; st;
+    stack&lt;int&gt; minSt;
+public:
+    void push(int val) {
+        st.push(val);
+        if (minSt.empty() || val <= minSt.top()) minSt.push(val);
+        else minSt.push(minSt.top());
+    }
+    void pop() {
+        st.pop();
+        minSt.pop();
+    }
+    int top() { return st.top(); }
+    int getMin() { return minSt.top(); }
+};</code></pre>
+          <p><b>Sab operations O(1)</b> — har push par minSt bhi update hoti hai, isliye getMin() bhi O(1) mein milta hai.</p>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> "Auxiliary stack" trick (ek extra stack alag info track karne ke liye) bohot common design pattern hai — Min Stack, Max Stack, dono isi tarah solve hote hain.</div>
+    </div>
+  </section>
+
+  <!-- SP5: SIMULATION -->
+  <section id="sp5">
+    <h2 class="section-title">Pattern 5 — Stack for Simulation</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "simulate a process step by step", "asteroid collision", "remove k digits" — jahan har naya element pichle elements se "interact" kar sakta ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Asteroid Collision</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Right-moving asteroids stack mein rakho; jab left-moving aaye, collisions simulate karo.</p>
+<pre><code>vector&lt;int&gt; asteroidCollision(vector&lt;int&gt;&amp; asteroids) {
+    vector&lt;int&gt; st;   // stack as vector
+
+    for (int a : asteroids) {
+        bool alive = true;
+        while (alive && a < 0 && !st.empty() && st.back() > 0) {
+            if (st.back() < -a) { st.pop_back(); continue; }
+            else if (st.back() == -a) { st.pop_back(); }
+            alive = false;
+        }
+        if (alive) st.push_back(a);
+    }
+    return st;
+}</code></pre>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Remove K Digits</span> (smallest number banao)</span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Monotonic increasing stack — jab bada digit pichle chhote digit se pehle aaye, chhota digit hata do (agar k bacha ho).</p>
+<pre><code>string removeKdigits(string num, int k) {
+    string st;   // stack as string
+    for (char c : num) {
+        while (!st.empty() && k > 0 && st.back() > c) {
+            st.pop_back();
+            k--;
+        }
+        st.push_back(c);
+    }
+    while (k-- > 0) st.pop_back();   // agar k bacha, end se hatao
+
+    int i = 0;
+    while (i < st.size() - 1 && st[i] == '0') i++;   // leading zeros hatao
+    string result = st.substr(i);
+    return result.empty() ? "0" : result;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Simulation pattern mein socho "kya current element pichle stack top ko affect kar sakta hai?" — agar haan, to while loop mein handle karo jab tak stable state na aa jaaye.</div>
+    </div>
+  </section>
+
+  <!-- ================= QUEUE TOPIC ================= -->
+  <div class="topic-banner">
+    <h1>🔵 QUEUE</h1>
+    <p>FIFO (First In, First Out) — jo pehle aaya, wahi pehle nikalta hai.</p>
+  </div>
+
+  <div class="part-banner">
+    <h2>📘 Part A — Queue Theory &amp; Concepts</h2>
+    <p>Pehle fundamentals clear karo — queue kaam kaise karta hai, C++ mein implement kaise karte hain.</p>
+  </div>
+
+  <!-- Q1 INTRO -->
+  <section id="q-intro">
+    <h2 class="section-title">1️⃣ Queue kya hota hai? (FIFO)</h2>
+    <p><b>Queue</b> ek linear data structure hai jo <b>FIFO (First In, First Out)</b> principle follow karta hai — jo element sabse pehle insert hua, wahi sabse pehle remove hota hai. Insertion <b>"rear/back"</b> se, deletion <b>"front"</b> se hoti hai.</p>
+
+    <div class="diagram">FRONT                          REAR
+  │                              │
+  ▼                              ▼
+┌────┬────┬────┬────┐
+│ 10 │ 20 │ 30 │ 40 │  ← naya element yahan add hoga (enqueue)
+└────┴────┴────┴────┘
+  ↑
+  yahan se nikalega (dequeue)</div>
+
+    <div class="callout analogy"><b>Samjho ise aise:</b> Ticket counter ki line socho — jo pehle line mein lagta hai, uski ticket pehle banti hai. Naye log line ke peeche (rear) join karte hain, service front se hoti hai.</div>
+
+    <div class="callout tip"><b>Tip:</b> Queue ka Stack se opposite behavior hai — Stack "recent" cheez deta hai, Queue "oldest" cheez deta hai. Isliye BFS (level-by-level) mein Queue use hota hai, DFS mein Stack.</div>
+  </section>
+
+  <!-- Q2 IMPLEMENTATION -->
+  <section id="q-impl">
+    <h2 class="section-title">2️⃣ Implementation in C++</h2>
+    <h3>STL <code>queue</code></h3>
+    <pre><code>#include &lt;queue&gt;
+using namespace std;
+
+queue&lt;int&gt; q;
+q.push(10);    // enqueue — rear mein add
+q.push(20);
+q.push(30);
+
+cout << q.front();  // 10
+q.pop();              // front se remove ho jaata hai
+cout << q.front();   // 20
+cout << q.empty();   // false
+cout << q.size();     // 2</code></pre>
+
+    <h3>STL <code>deque</code> (Double-Ended Queue — dono ends se operations)</h3>
+    <pre><code>#include &lt;deque&gt;
+deque&lt;int&gt; dq;
+dq.push_back(10);    // rear se add
+dq.push_front(5);     // front se add
+dq.pop_back();         // rear se remove
+dq.pop_front();        // front se remove</code></pre>
+    <div class="callout tip"><b>Tip:</b> LeetCode mein "sliding window maximum" jaise problems mein <code>deque</code> bohot use hota hai — dono ends se O(1) operations milte hain.</div>
+  </section>
+
+  <!-- Q3 OPS -->
+  <section id="q-ops">
+    <h2 class="section-title">3️⃣ Core Operations &amp; Complexity</h2>
+    <table>
+      <tr><th>Operation</th><th>Kya karta hai</th><th>Time</th></tr>
+      <tr><td><code>push(x)</code> / enqueue</td><td>Rear mein naya element daalo</td><td>O(1)</td></tr>
+      <tr><td><code>pop()</code> / dequeue</td><td>Front se element hatao</td><td>O(1)</td></tr>
+      <tr><td><code>front()</code></td><td>Front ka element dekho</td><td>O(1)</td></tr>
+      <tr><td><code>empty()</code></td><td>Queue khaali hai kya</td><td>O(1)</td></tr>
+    </table>
+  </section>
+
+  <!-- Q4 TYPES -->
+  <section id="q-types">
+    <h2 class="section-title">4️⃣ Types of Queue</h2>
+
+    <h3>Circular Queue</h3>
+    <p>Fixed-size array ko circularly use karta hai — rear end pahunchne ke baad wapas 0th index se use hota hai (space waste nahi hota).</p>
+
+    <h3>Priority Queue (Heap-based)</h3>
+    <pre><code>#include &lt;queue&gt;
+priority_queue&lt;int&gt; maxHeap;               // default: max-heap
+priority_queue&lt;int, vector&lt;int&gt;, greater&lt;int&gt;&gt; minHeap;  // min-heap
+
+maxHeap.push(30); maxHeap.push(10); maxHeap.push(20);
+cout << maxHeap.top();  // 30 (sabse bada pehle)</code></pre>
+    <p>Elements FIFO order mein nahi, balki <b>priority</b> ke hisaab se nikalte hain. Internally ye heap data structure hai.</p>
+
+    <h3>Deque (Double-Ended Queue)</h3>
+    <p>Dono ends se insert/delete O(1) mein — Sliding Window Maximum jaisi problems mein use hota hai.</p>
+
+    <table>
+      <tr><th>Type</th><th>Use Case</th></tr>
+      <tr><td>Simple Queue</td><td>BFS traversal, task scheduling</td></tr>
+      <tr><td>Circular Queue</td><td>Fixed buffer, round-robin scheduling</td></tr>
+      <tr><td>Priority Queue</td><td>Dijkstra's algorithm, top-k elements, task priority</td></tr>
+      <tr><td>Deque</td><td>Sliding window problems, palindrome check</td></tr>
+    </table>
+  </section>
+
+  <!-- Q5 COMPLEXITY -->
+  <section id="q-complexity">
+    <h2 class="section-title">5️⃣ Complexity Cheat Sheet</h2>
+    <table>
+      <tr><th>Operation</th><th>Simple Queue</th><th>Priority Queue</th><th>Deque</th></tr>
+      <tr><td>Insert</td><td>O(1)</td><td>O(log n)</td><td>O(1) dono ends</td></tr>
+      <tr><td>Remove</td><td>O(1)</td><td>O(log n)</td><td>O(1) dono ends</td></tr>
+      <tr><td>Peek/Top</td><td>O(1)</td><td>O(1)</td><td>O(1)</td></tr>
+    </table>
+  </section>
+
+  <div class="part-banner">
+    <h2>🎯 Part B — Standard Queue Patterns for LeetCode</h2>
+    <p>5 reusable patterns jo Queue-based LeetCode questions ka bulk cover karte hain.</p>
+  </div>
+
+  <!-- QP CHEATSHEET -->
+  <section id="qp-cheatsheet">
+    <h2 class="section-title">🎯 Pattern Recognition Cheat Sheet</h2>
+    <table>
+      <tr><th>Question mein ye dikhe...</th><th>Pattern</th></tr>
+      <tr><td>"level order traversal", "shortest path in unweighted graph", "minimum steps"</td><td>#1 BFS Traversal</td></tr>
+      <tr><td>"sliding window maximum/minimum"</td><td>#2 Monotonic Deque</td></tr>
+      <tr><td>"implement queue using stacks" (or vice versa)</td><td>#3 Two Stacks ↔ Queue</td></tr>
+      <tr><td>"kth largest", "top k frequent", "merge k sorted", "task scheduler"</td><td>#4 Priority Queue (Heap)</td></tr>
+      <tr><td>"design a circular queue/buffer"</td><td>#5 Circular Queue Design</td></tr>
+    </table>
+  </section>
+
+  <!-- QP1: BFS -->
+  <section id="qp1">
+    <h2 class="section-title">Pattern 1 — BFS Traversal</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "level order", "shortest path (unweighted)", "minimum number of steps" — jahan level-by-level explore karna ho.</div>
+
+      <h3>Template</h3>
+      <pre><code>queue&lt;Node*&gt; q;
+q.push(start);
+visited.insert(start);
+
+while (!q.empty()) {
+    Node* curr = q.front(); q.pop();
+    // process curr
+
+    for (Node* neighbor : curr->neighbors) {
+        if (!visited.count(neighbor)) {
+            visited.insert(neighbor);
+            q.push(neighbor);
+        }
+    }
+}</code></pre>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Binary Tree Level Order Traversal</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;vector&lt;int&gt;&gt; levelOrder(TreeNode* root) {
+    vector&lt;vector&lt;int&gt;&gt; result;
+    if (!root) return result;
+
+    queue&lt;TreeNode*&gt; q;
+    q.push(root);
+
+    while (!q.empty()) {
+        int size = q.size();
+        vector&lt;int&gt; level;
+        for (int i = 0; i < size; i++) {
+            TreeNode* node = q.front(); q.pop();
+            level.push_back(node->val);
+            if (node->left) q.push(node->left);
+            if (node->right) q.push(node->right);
+        }
+        result.push_back(level);
+    }
+    return result;
+}</code></pre>
+          <div class="callout tip"><b>Tip:</b> <code>size = q.size()</code> ko loop se pehle save karna hi "level by level" grouping ka trick hai.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Rotting Oranges</span> (multi-source BFS)</span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Saare rotten oranges ek saath queue mein daalo (multi-source), phir level-by-level spread karo.</p>
+<pre><code>int orangesRotting(vector&lt;vector&lt;int&gt;&gt;&amp; grid) {
+    int rows = grid.size(), cols = grid[0].size();
+    queue&lt;pair&lt;int,int&gt;&gt; q;
+    int fresh = 0;
+
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 2) q.push({i, j});
+            else if (grid[i][j] == 1) fresh++;
+        }
+
+    int minutes = 0;
+    vector&lt;pair&lt;int,int&gt;&gt; dirs = {{0,1},{0,-1},{1,0},{-1,0}};
+
+    while (!q.empty() && fresh > 0) {
+        int size = q.size();
+        for (int i = 0; i < size; i++) {
+            auto [r, c] = q.front(); q.pop();
+            for (auto&amp; [dr, dc] : dirs) {
+                int nr = r + dr, nc = c + dc;
+                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr][nc] == 1) {
+                    grid[nr][nc] = 2;
+                    fresh--;
+                    q.push({nr, nc});
+                }
+            }
+        }
+        minutes++;
+    }
+    return fresh == 0 ? minutes : -1;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> "Shortest path in unweighted graph/grid" dikhte hi BFS socho — Queue guarantee karta hai ki tum nodes ko unki "distance from source" ke increasing order mein visit karo.</div>
+    </div>
+  </section>
+
+  <!-- QP2: MONOTONIC DEQUE -->
+  <section id="qp2">
+    <h2 class="section-title">Pattern 2 — Monotonic Deque</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "sliding window maximum/minimum" — jahan window slide karte waqt max/min O(1) amortized mein chahiye ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🔴 <span class="lc-title">Sliding Window Maximum</span></span><span class="badge hard">Hard</span></summary>
+        <div class="details-body">
+          <p>Deque mein sirf "useful" indices rakho (decreasing value order) — front hamesha current window ka max hota hai.</p>
+<pre><code>vector&lt;int&gt; maxSlidingWindow(vector&lt;int&gt;&amp; nums, int k) {
+    deque&lt;int&gt; dq;   // indices store karte hain
+    vector&lt;int&gt; result;
+
+    for (int i = 0; i < nums.size(); i++) {
+        // window se bahar wale indices hatao
+        if (!dq.empty() && dq.front() <= i - k) dq.pop_front();
+
+        // chhote elements peeche se hatao (wo kabhi max nahi banenge)
+        while (!dq.empty() && nums[dq.back()] < nums[i]) dq.pop_back();
+
+        dq.push_back(i);
+
+        if (i >= k - 1) result.push_back(nums[dq.front()]);
+    }
+    return result;
+}</code></pre>
+          <p><b>Time:</b> O(n) — har index ek baar push aur ek baar pop hota hai.</p>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> Ye pattern Array ke "Monotonic Stack" jaisa hi hai, bas deque use hota hai kyunki window ke dono end se elements remove karne padte hain (front se "out of window", back se "chhote elements").</div>
+    </div>
+  </section>
+
+  <!-- QP3: TWO STACKS -->
+  <section id="qp3">
+    <h2 class="section-title">Pattern 3 — Two Stacks ↔ Queue (Design)</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "implement queue using stacks" ya "implement stack using queues" — classic design conversion question.</div>
+
+      <details>
+        <summary><span class="sum-left">🟢 <span class="lc-title">Implement Queue using Stacks</span></span><span class="badge easy">Easy</span></summary>
+        <div class="details-body">
+          <p>2 stacks — ek "input" ke liye, ek "output" ke liye. Jab output khaali ho, saara input reverse karke output mein daal do (LIFO se FIFO mil jaata hai).</p>
+<pre><code>class MyQueue {
+    stack&lt;int&gt; inSt, outSt;
+public:
+    void push(int x) {
+        inSt.push(x);
+    }
+
+    int pop() {
+        peek();
+        int val = outSt.top();
+        outSt.pop();
+        return val;
+    }
+
+    int peek() {
+        if (outSt.empty()) {
+            while (!inSt.empty()) {
+                outSt.push(inSt.top());
+                inSt.pop();
+            }
+        }
+        return outSt.top();
+    }
+
+    bool empty() {
+        return inSt.empty() && outSt.empty();
+    }
+};</code></pre>
+          <p><b>Amortized O(1)</b> per operation — har element max 2 baar move hota hai (in→out) apni poori lifetime mein.</p>
+        </div>
+      </details>
+
+      <div class="callout tip"><b>Tip:</b> Ye "amortized complexity" samajhne ke liye best example hai — kabhi kabhi ek operation O(n) legi (jab reverse ho raha ho), but average O(1) hi rehta hai.</div>
+    </div>
+  </section>
+
+  <!-- QP4: PRIORITY QUEUE -->
+  <section id="qp4">
+    <h2 class="section-title">Pattern 4 — Priority Queue (Heap)</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "kth largest/smallest", "top k frequent", "merge k sorted lists", "task scheduler" — jahan hamesha "current best/worst" O(log n) mein chahiye ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Kth Largest Element in an Array</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+          <p>Size-k ka min-heap maintain karo — heap ka top hamesha "kth largest so far" hoga.</p>
+<pre><code>int findKthLargest(vector&lt;int&gt;&amp; nums, int k) {
+    priority_queue&lt;int, vector&lt;int&gt;, greater&lt;int&gt;&gt; minHeap;
+
+    for (int num : nums) {
+        minHeap.push(num);
+        if (minHeap.size() > k) minHeap.pop();
+    }
+    return minHeap.top();
+}</code></pre>
+          <p><b>Time:</b> O(n log k) — sorting (O(n log n)) se better jab k chhota ho.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Top K Frequent Elements</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>vector&lt;int&gt; topKFrequent(vector&lt;int&gt;&amp; nums, int k) {
+    unordered_map&lt;int, int&gt; freq;
+    for (int num : nums) freq[num]++;
+
+    priority_queue&lt;pair&lt;int,int&gt;&gt; pq;   // max-heap by frequency
+    for (auto&amp; [num, count] : freq) pq.push({count, num});
+
+    vector&lt;int&gt; result;
+    while (k--) {
+        result.push_back(pq.top().second);
+        pq.pop();
+    }
+    return result;
+}</code></pre>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> "Top K" ya "Kth" wale questions mein Priority Queue O(n log k) deta hai, jo full sort (O(n log n)) se better hai jab k << n ho. C++ mein <code>priority_queue&lt;T, vector&lt;T&gt;, greater&lt;T&gt;&gt;</code> min-heap ke liye yaad rakho.</div>
+    </div>
+  </section>
+
+  <!-- QP5: CIRCULAR DESIGN -->
+  <section id="qp5">
+    <h2 class="section-title">Pattern 5 — Circular Queue Design</h2>
+    <div class="pattern-card">
+      <div class="signal"><b>Signal:</b> "design a circular queue/buffer with fixed size" — jahan array ko wraparound karke reuse karna ho.</div>
+
+      <details>
+        <summary><span class="sum-left">🟡 <span class="lc-title">Design Circular Queue</span></span><span class="badge medium">Medium</span></summary>
+        <div class="details-body">
+<pre><code>class MyCircularQueue {
+    vector&lt;int&gt; data;
+    int head, count, capacity;
+public:
+    MyCircularQueue(int k) {
+        data.resize(k);
+        head = 0; count = 0; capacity = k;
+    }
+
+    bool enQueue(int value) {
+        if (isFull()) return false;
+        int tail = (head + count) % capacity;
+        data[tail] = value;
+        count++;
+        return true;
+    }
+
+    bool deQueue() {
+        if (isEmpty()) return false;
+        head = (head + 1) % capacity;
+        count--;
+        return true;
+    }
+
+    int Front() { return isEmpty() ? -1 : data[head]; }
+    int Rear() { return isEmpty() ? -1 : data[(head + count - 1) % capacity]; }
+    bool isEmpty() { return count == 0; }
+    bool isFull() { return count == capacity; }
+};</code></pre>
+          <p><b>Core trick:</b> <code>% capacity</code> (modulo) se index wraparound karta hai — array ke end tak pahunchne ke baad wapas 0 se use hota hai.</p>
+        </div>
+      </details>
+
+      <div class="callout interview"><b>Interview Point:</b> Circular Queue real systems mein bohot use hota hai — jaise CPU scheduling buffers, streaming data buffers — jahan fixed memory reuse karna ho.</div>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section id="mistakes">
+    <h2 class="section-title">⚠️ Common Mistakes &amp; Interview Tips</h2>
+    <ul>
+      <li>C++ mein <code>stack.pop()</code> aur <code>queue.pop()</code> koi value return nahi karte — pehle <code>top()</code>/<code>front()</code> se le lo</li>
+      <li>Empty stack/queue pe <code>top()</code>/<code>front()</code> call karna — undefined behavior, hamesha <code>empty()</code> check karo</li>
+      <li>BFS mein <code>visited</code> set update karna bhool jaana — infinite loop ya duplicate processing ho sakti hai</li>
+      <li>Monotonic Stack/Deque mein condition (<code>&lt;</code> vs <code>&lt;=</code>) galat rakhna — duplicate handling change ho jaati hai</li>
+      <li>Priority Queue mein max-heap vs min-heap comparator confuse karna — <code>greater&lt;int&gt;</code> min-heap deta hai, default max-heap hota hai</li>
+      <li>Level order BFS mein <code>q.size()</code> ko loop shuru hone se pehle save na karna — level boundaries mix ho jaate hain</li>
+    </ul>
+    <div class="callout warn"><b>Dhyan dein:</b> Stack/Queue design problems mein hamesha edge cases (empty, full, single element) explicitly test karo.</div>
+  </section>
+
+  <!-- QA -->
+  <section id="qa">
+    <h2 class="section-title">🧠 Quick Revision — Click to Reveal</h2>
+
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Stack DFS ke liye aur Queue BFS ke liye kyun use hota hai?</div>
+      <div class="a">Stack (LIFO) sabse recently discovered node ko pehle explore karta hai — isse "deep" jaate ho (DFS). Queue (FIFO) sabse purane discovered nodes ko pehle process karta hai — isse "level by level" (BFS) explore hota hai.</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Monotonic Stack aur normal Stack mein kya farak hai?</div>
+      <div class="a">Monotonic Stack hamesha ek order maintain karta hai (increasing ya decreasing) — naya element push karne se pehle stack se "invalid" elements pop kar diye jaate hain. Ye "next greater/smaller" type problems ke liye O(n) solution deta hai.</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Priority Queue internally kaise kaam karta hai?</div>
+      <div class="a">Internally ek Binary Heap hota hai (array-based complete binary tree). Insert aur delete dono O(log n) mein hote hain, top/peek O(1) mein.</div>
+    </div>
+    <div class="qa" onclick="this.classList.toggle('open')">
+      <div class="q">Deque, Stack aur Queue dono ka kaam kar sakta hai kya?</div>
+      <div class="a">Haan — Deque (double-ended queue) dono ends se O(1) push/pop deta hai, isliye ye Stack (ek end use karke) aur Queue (dono ends use karke) dono ki tarah behave kar sakta hai. Isliye Monotonic Deque jaise patterns mein use hota hai.</div>
+    </div>
+  </section>
+
+  <!-- MASTER LIST -->
+  <section id="master-list">
+    <h2 class="section-title">📋 Master Practice List (Pattern-wise)</h2>
+
+    <h3>🟣 Stack Problems</h3>
+    <table>
+      <tr><th>#</th><th>Problem</th><th>Pattern</th><th>Level</th></tr>
+      <tr><td>1</td><td>Valid Parentheses</td><td>#1 Matching/Validity</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>2</td><td>Min Stack</td><td>#4 Min/Max Stack Design</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>3</td><td>Next Greater Element I</td><td>#2 Monotonic Stack</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>4</td><td>Daily Temperatures</td><td>#2 Monotonic Stack</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>5</td><td>Evaluate Reverse Polish Notation</td><td>#3 Expression Evaluation</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>6</td><td>Asteroid Collision</td><td>#5 Stack for Simulation</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>7</td><td>Remove K Digits</td><td>#5 Stack for Simulation</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>8</td><td>Decode String</td><td>#3 Expression Evaluation</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>9</td><td>Basic Calculator</td><td>#3 Expression Evaluation</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>10</td><td>Largest Rectangle in Histogram</td><td>#2 Monotonic Stack</td><td><span class="badge hard">Hard</span></td></tr>
+    </table>
+
+    <h3>🔵 Queue Problems</h3>
+    <table>
+      <tr><th>#</th><th>Problem</th><th>Pattern</th><th>Level</th></tr>
+      <tr><td>11</td><td>Implement Queue using Stacks</td><td>#3 Two Stacks ↔ Queue</td><td><span class="badge easy">Easy</span></td></tr>
+      <tr><td>12</td><td>Binary Tree Level Order Traversal</td><td>#1 BFS Traversal</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>13</td><td>Rotting Oranges</td><td>#1 BFS Traversal</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>14</td><td>Number of Islands</td><td>#1 BFS/DFS</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>15</td><td>Design Circular Queue</td><td>#5 Circular Queue Design</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>16</td><td>Kth Largest Element in an Array</td><td>#4 Priority Queue</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>17</td><td>Top K Frequent Elements</td><td>#4 Priority Queue</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>18</td><td>Task Scheduler</td><td>#4 Priority Queue</td><td><span class="badge medium">Medium</span></td></tr>
+      <tr><td>19</td><td>Merge k Sorted Lists</td><td>#4 Priority Queue</td><td><span class="badge hard">Hard</span></td></tr>
+      <tr><td>20</td><td>Sliding Window Maximum</td><td>#2 Monotonic Deque</td><td><span class="badge hard">Hard</span></td></tr>
+    </table>
+    <div class="callout tip"><b>Tip:</b> In 20 problems ko 2 baar solve karo — pattern muscle-memory ban jaayega aur naye unseen questions bhi crack ho jaayenge.</div>
+  </section>
+
+  <!-- TRACKER -->
+  <section id="tracker">
+    <h2 class="section-title">📊 Progress Tracker</h2>
+    <div class="progress-wrap">
+      <p style="margin:0; color:#fff; font-weight:600;">Progress: <span id="progress-text">0 / 14</span></p>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+      <div style="margin-top:14px;">
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Stack Theory — LIFO, STL stack operations</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Stack Pattern 1 — Matching/Validity</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Stack Pattern 2 — Monotonic Stack</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Stack Pattern 3 — Expression Evaluation</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Stack Pattern 4 — Min/Max Stack Design</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Stack Pattern 5 — Simulation</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Queue Theory — FIFO, STL queue/deque operations</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Queue Pattern 1 — BFS Traversal</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Queue Pattern 2 — Monotonic Deque</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Queue Pattern 3 — Two Stacks ↔ Queue</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Queue Pattern 4 — Priority Queue (Heap)</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Queue Pattern 5 — Circular Queue Design</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Kam se kam 10 Stack problems solve kiye</div>
+        <div class="check-item"><input type="checkbox" onchange="updateProgress()"> Kam se kam 10 Queue problems solve kiye</div>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">✨ Theory se Pattern tak — ab practice shuru karo. Consistency is the key! ✨</p>
+</div>
+
+<script>
+function updateProgress(){
+  const boxes = document.querySelectorAll('.check-item input');
+  let checked = 0;
+  boxes.forEach(b => { if(b.checked) checked++; });
+  document.getElementById('progress-text').innerText = checked + ' / ' + boxes.length;
+  document.getElementById('progress-fill').style.width = (checked/boxes.length*100) + '%';
+}
+</script>
+
+</body>
+</html>
