@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Binary Tree Notes (C++)</title>
+<style>
+:root{--bg:#fafaf7;--fg:#1d1d1b;--card:#fff;--mut:#666;--ac:#2f6fed;--bd:#e2e2dc;--code:#f1f1ec;--ok:#1a8a4a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#15161a;--fg:#e8e8e4;--card:#1e2026;--mut:#9a9a94;--ac:#7aa2ff;--bd:#2e3038;--code:#111216;--ok:#5fd68a}}
+:root[data-theme=dark]{--bg:#15161a;--fg:#e8e8e4;--card:#1e2026;--mut:#9a9a94;--ac:#7aa2ff;--bd:#2e3038;--code:#111216;--ok:#5fd68a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:860px;margin:auto;padding:16px}
+h1{font-size:1.6rem;margin:.3em 0}h2{margin:.2em 0;font-size:1.25rem}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+.tabs button{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--fg);padding:6px 12px;border-radius:99px;cursor:pointer;font-size:.85rem}
+.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin:12px 0}
+.tip{border-left:4px solid var(--ac);padding:4px 12px;margin:10px 0;background:var(--code);border-radius:0 8px 8px 0}
+pre{background:var(--code);border-radius:10px;padding:12px;overflow-x:auto;font-size:.85rem;line-height:1.5;margin:8px 0}
+.btn{border:1px solid var(--ac);background:none;color:var(--ac);padding:5px 12px;border-radius:8px;cursor:pointer;margin:2px}
+.btn:hover{background:var(--ac);color:#fff}
+label{display:block;margin:4px 0;font-size:.92rem}
+.prog{color:var(--ok);font-weight:600}
+svg{max-width:100%;height:auto}.nd circle{fill:var(--card);stroke:var(--fg);stroke-width:2}.nd.hit circle{fill:var(--ac);stroke:var(--ac)}.nd.hit text{fill:#fff}.nd text{fill:var(--fg);text-anchor:middle;font:600 15px sans-serif}
+.ln{stroke:var(--mut);stroke-width:2}
+#out{font:600 1.1rem monospace;min-height:1.6em;color:var(--ac)}
+small{color:var(--mut)}
+</style></head><body><main>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h1>🌳 Binary Tree Notes (C++)</h1><button class="btn" id="th" style="flex:none">🌙 Dark</button></div>
+<small>Beginner friendly • Hinglish • LeetCode patterns. Neeche tabs me ek-ek pattern padho, code samjho, aur problems tick karo.</small>
+<div class="tabs" id="tabs"></div>
+<div id="view"></div>
+</main>
+<script>
+const NODE=`struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};`;
+const P=[
+{t:"0. Basics",why:`<b>Binary tree</b> = har node ke max <b>2 bachche</b> (left, right). Top wale ko <b>root</b> bolte hain, jiske bachche nahi wo <b>leaf</b>.<br><b>Golden rule:</b> Tree ke 90% questions <b>recursion</b> se hote hain. Sochne ka tarika: <i>"Mai sirf ek node ka kaam karunga, baaki left aur right subtree ko recursion sambhal lega."</i>`,
+tip:`Har recursion me 2 cheez likho: <b>1) Base case</b> (node NULL ho to kya return karu?) <b>2) Kaam</b> (left + right call karke answer banao).`,
+code:NODE+`
+
+// Sabse simple recursion: nodes count karo
+int count(TreeNode* root) {
+    if (root == NULL) return 0;      // base case
+    return 1 + count(root->left) + count(root->right);
+}`,pr:[]},
+{t:"1. DFS Traversal",why:`<b>DFS</b> = pehle gehrai me jao. 3 tarike, bas <b>"root kab print karu"</b> ka farak hai:<br>• <b>Preorder</b>: Root → Left → Right<br>• <b>Inorder</b>: Left → Root → Right (BST me sorted deta hai!)<br>• <b>Postorder</b>: Left → Right → Root`,
+tip:`Yaad rakho: Pre = root <u>pehle</u>, In = root <u>beech me</u>, Post = root <u>baad me</u>. Neeche demo me try karo 👇`,demo:1,
+code:`void preorder(TreeNode* root, vector<int>& ans) {
+    if (!root) return;
+    ans.push_back(root->val);   // root pehle
+    preorder(root->left, ans);
+    preorder(root->right, ans);
+}
+void inorder(TreeNode* root, vector<int>& ans) {
+    if (!root) return;
+    inorder(root->left, ans);
+    ans.push_back(root->val);   // root beech me
+    inorder(root->right, ans);
+}
+void postorder(TreeNode* root, vector<int>& ans) {
+    if (!root) return;
+    postorder(root->left, ans);
+    postorder(root->right, ans);
+    ans.push_back(root->val);   // root last
+}`,pr:["144 Preorder Traversal","94 Inorder Traversal","145 Postorder Traversal"]},
+{t:"2. BFS / Level Order",why:`<b>BFS</b> = level by level (upar se neeche). <b>Queue</b> use hota hai. Trick: har level me pehle <code>size</code> nikal lo, phir utne nodes hi process karo.`,
+tip:`Ye template yaad kar lo, 6-7 questions isi se ban jaate hain (right side view, zigzag, average of levels, max width, min depth).`,demo:2,
+code:`vector<vector<int>> levelOrder(TreeNode* root) {
+    vector<vector<int>> ans;
+    if (!root) return ans;
+    queue<TreeNode*> q;
+    q.push(root);
+    while (!q.empty()) {
+        int size = q.size();          // is level ke nodes
+        vector<int> level;
+        for (int i = 0; i < size; i++) {
+            TreeNode* node = q.front(); q.pop();
+            level.push_back(node->val);
+            if (node->left)  q.push(node->left);
+            if (node->right) q.push(node->right);
+        }
+        ans.push_back(level);
+    }
+    return ans;
+}
+// Right Side View: har level ka LAST element (i == size-1) le lo.
+// Zigzag: odd level ko reverse() kar do.`,pr:["102 Level Order","199 Right Side View","103 Zigzag Level Order","637 Average of Levels","111 Min Depth","662 Max Width"]},
+{t:"3. Height (Bottom-Up)",why:`<b>Sabse important pattern!</b> Left aur right se <b>answer wapas mangao</b>, phir apna answer banao. Height = <code>1 + max(left, right)</code>.`,
+tip:`Bottom-up = "children se poocho, phir mai decide karunga". Diameter, Balanced, Max Path Sum sab isi ke bhai hain. Trick: recursion <b>return</b> kuch aur karta hai, aur <b>global answer</b> alag update hota hai.`,
+code:`int maxDepth(TreeNode* root) {
+    if (!root) return 0;
+    int l = maxDepth(root->left);
+    int r = maxDepth(root->right);
+    return 1 + max(l, r);
+}
+
+// Diameter: har node pe (l + r) se answer update karo,
+// lekin return sirf height karo.
+int best = 0;
+int height(TreeNode* root) {
+    if (!root) return 0;
+    int l = height(root->left);
+    int r = height(root->right);
+    best = max(best, l + r);      // global answer
+    return 1 + max(l, r);         // parent ko height chahiye
+}
+
+// Balanced: -1 return karo agar unbalanced
+int check(TreeNode* root) {
+    if (!root) return 0;
+    int l = check(root->left);
+    if (l == -1) return -1;
+    int r = check(root->right);
+    if (r == -1 || abs(l - r) > 1) return -1;
+    return 1 + max(l, r);
+}`,pr:["104 Max Depth","543 Diameter","110 Balanced Tree","124 Max Path Sum","687 Longest Univalue Path"]},
+{t:"4. Top-Down (Params)",why:`Yaha <b>upar se neeche information bhejte hain</b> function ke parameters me (jaise ab tak ka max, sum, depth).`,
+tip:`Agar question me "root se ab tak ka path" jaisa kuch ho, to parameter pass karo. Bottom-up me answer <u>upar aata hai</u>, top-down me info <u>neeche jaati hai</u>.`,
+code:`// Good Nodes: node good hai agar path me usse bada koi nahi
+int good(TreeNode* root, int mx) {
+    if (!root) return 0;
+    int cnt = 0;
+    if (root->val >= mx) { cnt = 1; mx = root->val; }
+    return cnt + good(root->left, mx) + good(root->right, mx);
+}
+// call: good(root, INT_MIN);
+
+// Path Sum: root se leaf tak sum == target?
+bool hasPathSum(TreeNode* root, int target) {
+    if (!root) return false;
+    if (!root->left && !root->right) return root->val == target;
+    return hasPathSum(root->left,  target - root->val) ||
+           hasPathSum(root->right, target - root->val);
+}`,pr:["1448 Good Nodes","112 Path Sum","129 Sum Root to Leaf Numbers","1026 Max Diff Node & Ancestor"]},
+{t:"5. Do Trees Saath",why:`Do trees ko <b>ek saath</b> chalao: <code>(a->left, b->left)</code> aur <code>(a->right, b->right)</code>.`,
+tip:`Symmetric me cross compare: <code>a->left</code> vs <code>b->right</code>. Pehle hamesha NULL cases check karo.`,
+code:`bool same(TreeNode* a, TreeNode* b) {
+    if (!a && !b) return true;      // dono khatam
+    if (!a || !b) return false;     // ek hi khatam
+    if (a->val != b->val) return false;
+    return same(a->left, b->left) && same(a->right, b->right);
+}
+bool mirror(TreeNode* a, TreeNode* b) {
+    if (!a && !b) return true;
+    if (!a || !b) return false;
+    return a->val == b->val &&
+           mirror(a->left, b->right) &&
+           mirror(a->right, b->left);
+}
+TreeNode* invertTree(TreeNode* root) {
+    if (!root) return NULL;
+    swap(root->left, root->right);
+    invertTree(root->left);
+    invertTree(root->right);
+    return root;
+}`,pr:["100 Same Tree","101 Symmetric Tree","226 Invert Tree","572 Subtree of Another Tree","617 Merge Two Trees"]},
+{t:"6. Path + Backtracking",why:`Jab <b>saare paths</b> chahiye (root se leaf), ek <code>path</code> vector banao, node daalo, recursion, phir <b>pop_back()</b> (backtrack).`,
+tip:`Leaf pe pahunch ke path ko answer me save karo. Wapas aate waqt pop_back karna mat bhoolna!`,
+code:`void dfs(TreeNode* root, int target, vector<int>& path,
+         vector<vector<int>>& ans) {
+    if (!root) return;
+    path.push_back(root->val);               // choose
+    target -= root->val;
+    if (!root->left && !root->right && target == 0)
+        ans.push_back(path);                 // leaf pe mila
+    dfs(root->left,  target, path, ans);
+    dfs(root->right, target, path, ans);
+    path.pop_back();                         // undo (backtrack)
+}`,pr:["113 Path Sum II","257 Binary Tree Paths","437 Path Sum III","1457 Pseudo-Palindromic Paths"]},
+{t:"7. LCA",why:`<b>Lowest Common Ancestor</b> = do nodes ka sabse neeche wala common baap.<br>Logic: agar left me bhi mila aur right me bhi, to <b>current node hi LCA</b> hai.`,
+tip:`Ye bottom-up pattern hai: NULL ya p/q mile to wahi return karo. Dono side non-NULL = answer yehi node.`,
+code:`TreeNode* lca(TreeNode* root, TreeNode* p, TreeNode* q) {
+    if (!root || root == p || root == q) return root;
+    TreeNode* l = lca(root->left, p, q);
+    TreeNode* r = lca(root->right, p, q);
+    if (l && r) return root;   // dono side mile
+    return l ? l : r;          // jo mila wo upar bhejo
+}
+
+// BST me aur easy: value dekh ke direction lo
+TreeNode* lcaBST(TreeNode* root, TreeNode* p, TreeNode* q) {
+    while (root) {
+        if (p->val < root->val && q->val < root->val) root = root->left;
+        else if (p->val > root->val && q->val > root->val) root = root->right;
+        else return root;
+    }
+    return NULL;
+}`,pr:["236 LCA of Binary Tree","235 LCA of BST","1650 LCA III","1123 LCA of Deepest Leaves"]},
+{t:"8. BST Patterns",why:`<b>BST</b>: left &lt; root &lt; right. <b>Inorder = sorted</b>, ye sabse bada hint hai.`,
+tip:`Validate BST me sirf parent se compare mat karo, poora <b>range (low, high)</b> pass karo. Kth smallest = inorder ka kth element.`,
+code:`// Search
+TreeNode* search(TreeNode* root, int x) {
+    if (!root || root->val == x) return root;
+    return x < root->val ? search(root->left, x) : search(root->right, x);
+}
+// Insert
+TreeNode* insert(TreeNode* root, int x) {
+    if (!root) return new TreeNode(x);
+    if (x < root->val) root->left  = insert(root->left, x);
+    else               root->right = insert(root->right, x);
+    return root;
+}
+// Validate: range pass karo
+bool valid(TreeNode* root, long long lo, long long hi) {
+    if (!root) return true;
+    if (root->val <= lo || root->val >= hi) return false;
+    return valid(root->left, lo, root->val) &&
+           valid(root->right, root->val, hi);
+}
+// call: valid(root, LLONG_MIN, LLONG_MAX);
+
+// Kth smallest: inorder me count karo
+int cnt = 0, res = -1;
+void kth(TreeNode* root, int k) {
+    if (!root || res != -1) return;
+    kth(root->left, k);
+    if (++cnt == k) { res = root->val; return; }
+    kth(root->right, k);
+}`,pr:["700 Search in BST","701 Insert into BST","98 Validate BST","230 Kth Smallest","450 Delete Node in BST","108 Sorted Array to BST","530 Min Abs Difference"]},
+{t:"9. Build Tree",why:`Do traversals se tree banao. <b>Preorder</b> ka pehla element = root. <b>Inorder</b> me root dhundo: uske left ke elements = left subtree, right ke = right subtree.`,
+tip:`Speed ke liye inorder ka <code>unordered_map</code> banao (value → index) taki dhundna O(1) ho.`,
+code:`unordered_map<int,int> pos;   // inorder value -> index
+int pre = 0;
+TreeNode* build(vector<int>& preorder, int l, int r) {
+    if (l > r) return NULL;
+    TreeNode* root = new TreeNode(preorder[pre++]);
+    int mid = pos[root->val];
+    root->left  = build(preorder, l, mid - 1);
+    root->right = build(preorder, mid + 1, r);
+    return root;
+}
+TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+    for (int i = 0; i < inorder.size(); i++) pos[inorder[i]] = i;
+    return build(preorder, 0, inorder.size() - 1);
+}`,pr:["105 Pre + In build","106 In + Post build","889 Pre + Post build","654 Max Binary Tree","1008 BST from Preorder"]},
+{t:"10. Serialize",why:`Tree ko string me badlo aur wapas banao. Preorder + <b>"#" for NULL</b> use karo, taki structure yaad rahe.`,
+tip:`Ye "tree ko string banana" wala idea "Duplicate Subtrees" jaise hard questions me bhi kaam aata hai.`,
+code:`void ser(TreeNode* root, string& s) {
+    if (!root) { s += "#,"; return; }
+    s += to_string(root->val) + ",";
+    ser(root->left, s);
+    ser(root->right, s);
+}
+TreeNode* des(stringstream& ss) {
+    string x;
+    getline(ss, x, ',');
+    if (x == "#") return NULL;
+    TreeNode* root = new TreeNode(stoi(x));
+    root->left  = des(ss);
+    root->right = des(ss);
+    return root;
+}`,pr:["297 Serialize/Deserialize","652 Find Duplicate Subtrees","449 Serialize BST","572 Subtree of Another Tree"]},
+{t:"11. Iterative",why:`Recursion ki jagah <b>stack</b> use karo. Interview me kabhi kabhi "without recursion" puchte hain.`,
+tip:`Inorder: left jaha tak ja sako jao (stack me daalo), phir pop karo, print karo, right pe jao.`,
+code:`vector<int> inorderIter(TreeNode* root) {
+    vector<int> ans;
+    stack<TreeNode*> st;
+    TreeNode* cur = root;
+    while (cur || !st.empty()) {
+        while (cur) { st.push(cur); cur = cur->left; }
+        cur = st.top(); st.pop();
+        ans.push_back(cur->val);
+        cur = cur->right;
+    }
+    return ans;
+}
+// Preorder iterative: root pop karo, pehle right push, phir left push.`,pr:["94 Inorder (iterative)","144 Preorder (iterative)","173 BST Iterator","145 Postorder (iterative)"]},
+{t:"12. Cheat Sheet",why:`<b>Question dekh ke pattern kaise pehchane?</b> Ye table yaad rakho 👇`,
+tip:`Har question me pehle 2 sawal khud se poocho: "Answer upar bhejna hai ya neeche?" aur "Level chahiye ya depth?"`,
+table:[["Question me kya likha hai","Pattern"],["level, right view, zigzag, width","BFS + queue"],["height, diameter, balanced, max path","Bottom-Up (return + global ans)"],["root se ab tak, good node, path sum","Top-Down (parameter)"],["same, symmetric, merge, subtree","Do trees saath"],["saare paths","Backtracking"],["common ancestor","LCA"],["BST, sorted, kth","Inorder / range"],["preorder + inorder diya","Build tree"],["tree ko string","Serialize"]]}
+];
+const $=s=>document.querySelector(s);
+let cur=0,timer;
+let done={};try{done=JSON.parse(localStorage.getItem("bt")||"{}")}catch(e){}
+function save(){try{localStorage.setItem("bt",JSON.stringify(done))}catch(e){}}
+function tabs(){$("#tabs").innerHTML="";P.forEach((p,i)=>{const b=document.createElement("button");b.textContent=p.t;b.className=i==cur?"on":"";b.onclick=()=>{cur=i;clearInterval(timer);tabs();show()};$("#tabs").appendChild(b)})}
+function show(){
+ const p=P[cur];let h=`<div class="card"><h2>${p.t}</h2><p>${p.why}</p><div class="tip">💡 ${p.tip}</div></div>`;
+ if(p.demo)h+=`<div class="card"><b>▶ Interactive demo</b> ${p.demo==1?`<div><button class="btn" data-o="pre">Preorder</button><button class="btn" data-o="in">Inorder</button><button class="btn" data-o="post">Postorder</button></div>`:`<div><button class="btn" data-o="lvl">Level Order (BFS)</button></div>`}<div id="tree"></div><div id="out">Button dabao...</div></div>`;
+ if(p.table)h+=`<div class="card" style="overflow-x:auto"><table style="border-collapse:collapse;width:100%">${p.table.map((r,i)=>`<tr>${r.map(c=>`<${i?'td':'th'} style="border:1px solid var(--bd);padding:6px 10px;text-align:left">${c}</${i?'td':'th'}>`).join("")}</tr>`).join("")}</table></div>`;
+ if(p.code)h+=`<div class="card"><b>C++ Code</b> <button class="btn" id="cp">Copy</button><pre id="code"></pre></div>`;
+ if(p.pr&&p.pr.length)h+=`<div class="card"><b>LeetCode Practice</b> <span class="prog" id="pg"></span>${p.pr.map((q,i)=>`<label><input type="checkbox" data-k="${cur}-${i}" ${done[cur+"-"+i]?"checked":""}> ${q}</label>`).join("")}</div>`;
+ h+=`<div><button class="btn" id="pv" ${cur?"":"disabled"}>← Pichla</button><button class="btn" id="nx" ${cur<P.length-1?"":"disabled"}>Agla →</button></div>`;
+ $("#view").innerHTML=h;
+ if(p.code){$("#code").textContent=p.code;$("#cp").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(p.code).then(()=>$("#cp").textContent="Copied ✓").catch(()=>{})}}
+ document.querySelectorAll("input[data-k]").forEach(c=>c.onchange=()=>{done[c.dataset.k]=c.checked;save();prog()});prog();
+ $("#pv").onclick=()=>{cur--;tabs();show();scrollTo(0,0)};$("#nx").onclick=()=>{cur++;tabs();show();scrollTo(0,0)};
+ if(p.demo){draw();document.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>run(b.dataset.o))}
+}
+function prog(){const p=P[cur],e=$("#pg");if(!e)return;const n=p.pr.filter((_,i)=>done[cur+"-"+i]).length;e.textContent=` ${n}/${p.pr.length} done`}
+// demo tree: 4(2(1,3),6(5,7))
+const T={4:[2,6],2:[1,3],6:[5,7]},XY={4:[250,30],2:[130,90],6:[370,90],1:[70,150],3:[190,150],5:[310,150],7:[430,150]};
+function draw(){let s='<svg viewBox="0 0 500 180">';for(const k in T)T[k].forEach(c=>s+=`<line class="ln" x1="${XY[k][0]}" y1="${XY[k][1]}" x2="${XY[c][0]}" y2="${XY[c][1]}"/>`);for(const k in XY)s+=`<g class="nd" id="n${k}"><circle cx="${XY[k][0]}" cy="${XY[k][1]}" r="20"/><text x="${XY[k][0]}" y="${XY[k][1]+5}">${k}</text></g>`;$("#tree").innerHTML=s+"</svg>"}
+function run(o){clearInterval(timer);const r=[];const f=n=>{if(!n)return;const c=T[n]||[];if(o=="pre")r.push(n);f(c[0]);if(o=="in")r.push(n);f(c[1]);if(o=="post")r.push(n)};
+ if(o=="lvl"){let q=[4];while(q.length){const n=q.shift();r.push(n);(T[n]||[]).forEach(c=>q.push(c))}}else f(4);
+ document.querySelectorAll(".nd").forEach(n=>n.classList.remove("hit"));$("#out").textContent="";let i=0;
+ timer=setInterval(()=>{if(i>=r.length){clearInterval(timer);return}document.getElementById("n"+r[i]).classList.add("hit");$("#out").textContent=r.slice(0,++i).join(" → ")},700)}
+function setTheme(t){document.documentElement.dataset.theme=t;$("#th").textContent=t=="dark"?"☀️ Light":"🌙 Dark";try{localStorage.setItem("bt-theme",t)}catch(e){}}
+let th=null;try{th=localStorage.getItem("bt-theme")}catch(e){}
+if(!th)th=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+setTheme(th);
+$("#th").onclick=()=>setTheme(document.documentElement.dataset.theme=="dark"?"light":"dark");
+tabs();show();
+</script></body></html>
